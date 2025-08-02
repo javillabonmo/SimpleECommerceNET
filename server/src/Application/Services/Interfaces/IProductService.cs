@@ -16,7 +16,7 @@ namespace Application.Services.Interfaces;
  */
 public interface IProductService
 {
-    ProductResponse AddProduct(ProductRequest? productAddRequest); //return the object created
+    ProductResponse AddProduct(RequestProduct? productAddRequest); //return the object created
 
     //en lugar de usar null o false manejar excepciones para los casos de error
     //GetProductById |get| -> return the object o null si no existe
@@ -24,8 +24,14 @@ public interface IProductService
     // UpdateProduct |put-patch| -> return ProductDto con el objeto actualizado,true o null si no existe
     // DeleteProduct |delete| -> return true si se elimino, false si no existe
 
-    ProductResponse? GetProductById(int id); 
+    ProductResponse? GetProductById(int id);
+    ///<summary>
+    /// Retorna un producto por su ID.
+    ///</summary>
+    ///<param name="id">guid por el cual buscar el producto</param>
+    ///<returns>retorna un objeto producto</returns>
+    ProductResponse? GetProductById(Guid id);
     IEnumerable<ProductResponse> GetProducts(); 
-    ProductResponse? UpdateProduct(int id,ProductRequest? productUpdateRequest); //return ProductDto con el objeto actualizado,true o null si no existe
+    ProductResponse? UpdateProduct(int id,RequestProduct? productUpdateRequest); //return ProductDto con el objeto actualizado,true o null si no existe
     bool DeleteProduct(int id); //return true si se elimino, false si no existe
 }

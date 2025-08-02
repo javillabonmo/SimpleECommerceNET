@@ -1,12 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 using Application.DTOs;
+using Application.Services.Helpers;
 using Application.Services.Interfaces;
 using Domain.Entities.Inventory;
+using Domain.Entities.Sales;
 
 namespace Application.Services;
 public class ProductService : IProductService
@@ -14,19 +17,21 @@ public class ProductService : IProductService
 {
     //dbcontext 
     private readonly List<Product> _products;
+    private readonly ICategoryService _categories;
 
     // Constructor
     public ProductService()
     {
         // Simulando una base de datos en memoria
         _products = new List<Product>();
+        _categories = new CategoryService(); 
     }
 
-    public ProductResponse AddProduct(ProductRequest? productAddRequest)
+    public ProductResponse AddProduct(RequestProduct? productAddRequest)
     {
         if (productAddRequest == null)
         {
-            throw new ArgumentNullException(nameof(productAddRequest), "ProductRequest cannot be null.");
+            throw new ArgumentNullException(nameof(productAddRequest), "RequestProduct cannot be null.");
         }
 
         if (string.IsNullOrWhiteSpace(productAddRequest.Name))
@@ -44,12 +49,16 @@ public class ProductService : IProductService
             throw new ArgumentException("Product with the same name already exists.", nameof(productAddRequest.Name));
         }
 
+        ValidationHelper.Validate(productAddRequest);
+
         // Convertir y agregar
+        productAddRequest.Category = _categories.GetCategoryByGuid(productAddRequest.CategoryId);
         Product product = productAddRequest.ToProduct();
         product.Id = Guid.NewGuid();
+
         _products.Add(product);
 
-        return product.ToResponse();
+        return product.ToProductResponse();
     }
 
     public bool DeleteProduct(int id)
@@ -62,12 +71,25 @@ public class ProductService : IProductService
         throw new NotImplementedException();
     }
 
-    public IEnumerable<ProductResponse> GetProducts()
+    public ProductResponse? GetProductById(Guid id)
     {
-        throw new NotImplementedException();
+        if (id == Guid.Empty)
+        {
+            throw new ArgumentException("Product ID cannot be empty.", nameof(id));
+        }
+        //si retorno null es por que no es un error que no haya encontrado el producto, por lo tanto no tiene sentido lanzar una excepcion
+        return _products
+            .FirstOrDefault(product => product.Id == id)?
+            .ToProductResponse();//operador condicional null (?.) para evitar excepciones si el producto no se encuentra
     }
 
-    public ProductResponse? UpdateProduct(int id, ProductRequest? productUpdateRequest)
+    public IEnumerable<ProductResponse> GetProducts()
+    {
+        //throw new NotImplementedException();
+        return _products.Select(product => product.ToProductResponse());
+    }
+
+    public ProductResponse? UpdateProduct(int id, RequestProduct? productUpdateRequest)
     {
         throw new NotImplementedException();
     }

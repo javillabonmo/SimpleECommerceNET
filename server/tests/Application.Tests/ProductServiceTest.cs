@@ -10,7 +10,7 @@ public class ProductServiceTest
     /*
      * Asegura que las reglas de negocio y seguridad se cumplan
      * verificar que se lancen las excepciones correctas
-     * 1.Cuando ProductRequest.Name es null, se lanza ArgumentException
+     * 1.Cuando RequestProduct.Name es null, se lanza ArgumentException
      * 2.Cuando el Price es 0, lanza excepción
      * Cuando el producto se guarda bien, su Id no debe ser Guid.Empty
      * Cuando se consulta por ID inexistente, devuelve null o lanza NotFoundException
@@ -33,12 +33,12 @@ public class ProductServiceTest
     //cada requerimiento es una funcion de test
     //MétodoAEvaluar_CondiciónEsperada_ResultadoEsperado
 
-    //2. si ProductRequest es nulo, debe lanzar una excepción
+    //2. si RequestProduct es nulo, debe lanzar una excepción
     [Fact]
     public void AddProduct_NullRequest_ThrowsArgumentNullException()
     {
         // Arrange
-        ProductRequest? productAddRequest = null;
+        RequestProduct? productAddRequest = null;
         // Act & Assert
         Assert.Throws<ArgumentNullException>(() => _productService.AddProduct(productAddRequest));
     }
@@ -47,7 +47,7 @@ public class ProductServiceTest
     public void AddProduct_NullOrEmptyName_ThrowsArgumentException()
     {
         // Arrange
-        ProductRequest productAddRequest = new ProductRequest
+        RequestProduct productAddRequest = new RequestProduct
         {
             Name = null, // or string.Empty
             Price = 10.0m,
@@ -61,7 +61,7 @@ public class ProductServiceTest
     public void AddProduct_NegativeOrZeroPrice_ThrowsArgumentException()
     {
         // Arrange
-        ProductRequest productAddRequest = new ProductRequest
+        RequestProduct productAddRequest = new RequestProduct
         {
             Name = "Test Product",
             Price = 0.0m, // or negative value
@@ -74,13 +74,13 @@ public class ProductServiceTest
     public void AddProduct_DuplicateName_ArgumentExceptionn()
     {
         // Arrange
-        ProductRequest productAddRequest1 = new ProductRequest
+        RequestProduct productAddRequest1 = new RequestProduct
         {
             Name = "Test Product",
             Price = 10.0m,
         };
         _productService.AddProduct(productAddRequest1); // Add first product
-        ProductRequest productAddRequest2 = new ProductRequest
+        RequestProduct productAddRequest2 = new RequestProduct
         {
             Name = "Test Product", // Duplicate name
             Price = 15.0m,
@@ -93,7 +93,7 @@ public class ProductServiceTest
     public void AddProduct_ValidRequest_ProductIdIsNotEmpty()
     {
         // Arrange
-        ProductRequest productAddRequest = new ProductRequest
+        RequestProduct productAddRequest = new RequestProduct
         {
             Name = "Valid Product",
             Price = 20.0m,
@@ -106,6 +106,34 @@ public class ProductServiceTest
     #endregion
 
     #region GetProductById
+
+    [Fact]
+    //1. si el Id es Guid.Empty, debe lanzar una excepción
+    public void GetProductById_EmptyGuid_ThrowsArgumentException()
+    {
+        // Arrange
+        Guid id = Guid.Empty;
+        // Act & Assert
+        Assert.Throws<ArgumentException>(() => _productService.GetProductById(id));
+    }
+    [Fact]
+    public void GetProductById_ValidId_ReturnsProductResponse()
+    {
+        // Arrange
+        RequestProduct productAddRequest = new RequestProduct
+        {
+            Name = "Test Product",
+            Price = 10.0m,
+        };
+        ProductResponse addedProduct = _productService.AddProduct(productAddRequest);
+        
+        // Act
+        ProductResponse? response = _productService.GetProductById(addedProduct.Id);
+        
+        // Assert
+        Assert.NotNull(response);
+        Assert.Equal(addedProduct.Id, response.Id);
+    }
     #endregion
 
     #region GetProducts
