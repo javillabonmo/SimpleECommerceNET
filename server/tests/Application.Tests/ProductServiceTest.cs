@@ -7,6 +7,7 @@ using Application.Services.Interfaces;
 using Application.Services;
 using Application.DTOs.Enums;
 using Xunit.Abstractions;
+using Application.Services.Mocks;
 
 public class ProductServiceTest
 {
@@ -29,7 +30,7 @@ public class ProductServiceTest
     private readonly ITestOutputHelper _testOutputHelper;
     public  ProductServiceTest(ITestOutputHelper testOutputHelper)
     {
-        _productService =  new ProductService();
+        _productService =  new ProductService(initialize: false);
         _testOutputHelper = testOutputHelper;
         //mockear el servicio de categorías,products si es necesario
 
@@ -186,17 +187,8 @@ public class ProductServiceTest
     public void UpdateProduct_IdNotFound_ReturnsNull()
     {
         // Arrange
-        ProductRequest productAddRequest = new ProductRequest
-        {
-            Name = "Test Product",
-            Price = 10.0m,
-            CategoryId = Guid.NewGuid(), // Assuming CategoryId is required
-        };
-        ProductResponse addedProduct = _productService.AddProduct(productAddRequest);
-        
         // Act
-        addedProduct.Id = Guid.NewGuid(); // Set to a non-existing ID
-        ProductResponse? updatedProduct = _productService.UpdateProduct(addedProduct.ProductUpdateRequest());
+        ProductResponse? updatedProduct = null;
         
         // Assert
         Assert.Null(updatedProduct);

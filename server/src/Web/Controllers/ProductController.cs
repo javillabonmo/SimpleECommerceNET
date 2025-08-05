@@ -15,9 +15,22 @@ public class ProductController : Controller
 
 
     [Route("/products")]
-    public IActionResult Index()
+    public IActionResult Index(string searchBy,string? searchString)
     {
-        IEnumerable<ProductResponse> products = _productService.GetProducts();
+        ViewBag.SearchFields = new Dictionary<string, string>()
+        {
+            {nameof(ProductResponse.Name),"Nombre" },
+             {"Category"+nameof(ProductResponse.Category.Name),"Nombre Categoria" },
+             {nameof(ProductResponse.Price),"Precio" },
+             {nameof(ProductResponse.Stock),"Stock" },
+             {nameof(ProductResponse.CreatedAt),"Creado El" },
+             {nameof(ProductResponse.LastUpdatedAt),"Ultima Actualizacion" }
+        };
+        ViewBag.CurrentSearchBy = searchBy;
+        ViewBag.CurrentSearchString = searchString;
+
+        IEnumerable<ProductResponse> products = _productService.GetFilteredProducts(searchBy,searchString);
         return View(products);
     }
+
 }

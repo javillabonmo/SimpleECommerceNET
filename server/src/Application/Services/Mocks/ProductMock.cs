@@ -72,6 +72,23 @@ public static class ProductMock
                     },
                     CreatedAt = DateTime.Now,
                     LastUpdatedAt = DateTime.Now
+                },
+                new ProductResponse
+                {
+                    Id = Guid.NewGuid(),
+                    Name = "nombre camel2",
+                    Price = 75.00m,
+                    Stock = 200,
+                    Category = new CategoryResponse
+                    {
+                        Id = Guid.NewGuid(),
+                        Name = "rara",
+                        Discount = 15,
+                        CreatedAt = DateTime.Now,
+                        LastUpdatedAt = DateTime.Now
+                    },
+                    CreatedAt = DateTime.Now,
+                    LastUpdatedAt = DateTime.Now
                 }
             };
     }

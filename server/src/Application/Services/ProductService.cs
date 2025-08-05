@@ -1,6 +1,4 @@
-﻿
-
-using Application.DTOs;
+﻿using Application.DTOs;
 using Application.DTOs.Enums;
 using Application.Services.Helpers;
 
@@ -19,7 +17,7 @@ public class ProductService : IProductService
     private readonly ICategoryService _categories;
 
     // Constructor
-    public ProductService( bool initialize = true)
+    public ProductService(bool initialize = true)
     {
         // Simulando una base de datos en memoria
         _products = new List<Product>();
@@ -103,12 +101,16 @@ public class ProductService : IProductService
         {
             return allProducts;
         }
-        return searchBy.ToLower() switch
-        {   
+
+        return searchBy switch
+        {
             nameof(Product.Name) => allProducts.Where(p => p.Name.Contains(searchString, StringComparison.OrdinalIgnoreCase)),
-            nameof(Product.Category) =>allProducts.Where(p => p.Category.Name.Contains(searchString, StringComparison.OrdinalIgnoreCase)),
+            nameof(Product.Category) => allProducts.Where(p => p.Category.Name.Contains(searchString, StringComparison.OrdinalIgnoreCase)),
+            nameof(Product.Stock) =>
+                uint.TryParse(searchString, out uint stockValue)
+                    ? allProducts.Where(p => p.Stock >= stockValue)
+                    : Enumerable.Empty<ProductResponse>(),
             _ => throw new ArgumentException("Invalid search criteria.", nameof(searchBy))
-            //para fechas se convierte en string y se compara con Contains
         };
     }
 

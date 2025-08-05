@@ -7,32 +7,60 @@
 
 <main>
 	<h1>Lista de productos: </h1>
-
-	<table>
-		<thead>
-			<tr>
-				<th>Id</th>
-				<th>Nombre</th>
-				<th>Categoria</th>
-				<th>Precio</th>
-				<th>Stock</th>
-				<th>Creado el</th>
-				<th>Ultima actualizacion</th>
-			</tr>
-		</thead>
-		<tbody>
-			@foreach (ProductResponse product in Model)
+	<form action="/products" method="get">
+	<div>
+		<select class="form-input" name="searchBy">
+			@foreach(var field in ViewBag.SearchFields)
 			{
-				<tr>
-					<td>@product.Id</td>
-					<td>@product.Name</td>
-					<td>@product.Category.Name</td>
-					<td>@product.Price.ToString("C")</td>
-					<td>@product.Stock</td>
-					<td>@product.CreatedAt.ToString("g")</td>
-					<td>@product.LastUpdatedAt.ToString("g")</td>
-				</tr>
+					if (field.Key == ViewBag.CurrentSearchBy)
+					{
+						<option value="@field.Key" selected="selected">@field.Value</option>
+					}
+					else
+					{
+						<option value="@field.Key">@field.Value</option>
+					}
+					
 			}
-		</tbody>
-	</table>
+			
+		</select>	
+	</div>
+	<div>
+			<input type="search" id="Search" class="form-input" placeholder="Buscar" name="searchString" value="@ViewBag.CurrentSearchString">
+	</div>
+	<div>
+		<button type="submit">Buscar</button>
+		<a href="/products">Limpiar Filtros</a>
+	</div>
+	
+		<table>
+			<thead>
+				<tr>
+					<th>Id</th>
+					<th>Nombre</th>
+					<th>Categoria</th>
+					<th>Precio</th>
+					<th>Stock</th>
+					<th>Creado el</th>
+					<th>Ultima actualizacion</th>
+				</tr>
+			</thead>
+			<tbody>
+				@foreach (ProductResponse product in Model)
+				{
+					<tr>
+						<td>@product.Id</td>
+						<td>@product.Name</td>
+						<td>@product.Category.Name</td>
+						<td>@product.Price.ToString("C")</td>
+						<td>@product.Stock</td>
+						<td>@product.CreatedAt.ToString("g")</td>
+						<td>@product.LastUpdatedAt.ToString("g")</td>
+					</tr>
+				}
+			</tbody>
+		</table>
+	
+	</form>
+	
 </main>
