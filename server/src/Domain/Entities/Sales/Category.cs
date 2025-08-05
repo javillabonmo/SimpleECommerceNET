@@ -2,8 +2,8 @@
 
 namespace Domain.Entities.Sales;
 
-public class Category(string name, int discount = 0) :  AuditableEntityBase
+public class Category:  AuditableEntityBase
 {
-    public string Name { get; set; } = name;
-    public int Discount { get; set; } = discount;
+    public string Name { get; set; } = string.Empty;
+    public int Discount { get; set; }
 }

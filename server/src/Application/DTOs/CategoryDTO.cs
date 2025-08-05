@@ -1,19 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
+﻿
 using Domain.Entities.Sales;
 
 namespace Application.DTOs;
-public class RequestCategory
+public class CategoryAddRequest
 {
     public string Name { get; set; } = string.Empty;
     public int Discount { get; set; } = 20;
     public Category ToCategory()
     {
-        return new Category(Name, Discount);
+        return new Category
+        {
+            Name = Name,
+            Discount = Discount
+        };
     }
     
 }
@@ -49,9 +48,9 @@ public class CategoryResponse
                CreatedAt == responseCategory.CreatedAt &&
                LastUpdatedAt == responseCategory.LastUpdatedAt;
     }
-    public RequestCategory ToRequestCategory()
+    public CategoryAddRequest ToRequestCategory()
     {
-        return new RequestCategory()
+        return new CategoryAddRequest()
         {
             Name = Name,
             Discount = Discount
@@ -64,6 +63,21 @@ public class CategoryResponse
     public override string ToString()
     {
         return $"Id: {Id}, Name: {Name}, Discount: {Discount}, CreatedAt: {CreatedAt}, LastUpdatedAt: {LastUpdatedAt}";
+    }
+
+
+}
+public class CategoryUpdateRequest : CategoryAddRequest
+{
+    public Guid Id { get; set; }
+    public Category ToCategory()
+    {
+        return new Category
+        {
+            Id = Id,
+            Name = Name,
+            Discount = Discount
+        };
     }
 }
 

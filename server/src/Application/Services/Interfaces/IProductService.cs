@@ -1,4 +1,6 @@
 ﻿using Application.DTOs;
+using Application.DTOs.Enums;
+
 
 namespace Application.Services.Interfaces;
 
@@ -16,7 +18,7 @@ namespace Application.Services.Interfaces;
  */
 public interface IProductService
 {
-    ProductResponse AddProduct(RequestProduct? productAddRequest); //return the object created
+    ProductResponse AddProduct(ProductRequest? productAddRequest); //return the object created
 
     //en lugar de usar null o false manejar excepciones para los casos de error
     //GetProductById |get| -> return the object o null si no existe
@@ -32,6 +34,15 @@ public interface IProductService
     ///<returns>retorna un objeto producto</returns>
     ProductResponse? GetProductById(Guid id);
     IEnumerable<ProductResponse> GetProducts(); 
-    ProductResponse? UpdateProduct(int id,RequestProduct? productUpdateRequest); //return ProductDto con el objeto actualizado,true o null si no existe
-    bool DeleteProduct(int id); //return true si se elimino, false si no existe
+    ProductResponse? UpdateProduct(ProductUpdateRequest? productUpdateRequest); //return ProductDto con el objeto actualizado,true o null si no existe
+    bool DeleteProduct(Guid id); //return true si se elimino, false si no existe
+    // bool DeleteProduct(int id,Guid userId);//informacion del usuario que elimina el producto, puede ser un token de autenticacion 
+    IEnumerable<ProductResponse> GetFilteredProducts(string searchBy,string? searchString);
+
+    //IEnumerable<ProductResponse> GetFilteredProducts(string? searchBy, string? searchString, int pageNumber, int pageSize);
+
+    //IEnumerable<ProductResponse> DeleteMultipleProductsById(IEnumerable<int> selectedIds);
+
+
+    IEnumerable<ProductResponse> GetSortedProducts(IEnumerable<ProductResponse> products,string sortBy, SortOrderEnum sortOrder);
 }

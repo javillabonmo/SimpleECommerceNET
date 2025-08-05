@@ -5,18 +5,18 @@ using Domain.Entities.Inventory;
 using Domain.Entities.Sales;
 
 namespace Application.DTOs;
-public class RequestProduct 
+public class ProductRequest 
 {   
     Item Item { get; set; }
     public string Name { get; set; } = string.Empty;
     public CategoryResponse Category { get; set; }
     public Guid CategoryId { get; set; }
-    uint Stock { get; set; }
+    public uint Stock { get; set; }
     public required decimal Price { get; set; }
 
     public Product ToProduct()
     {
-        return new Product() {Name = Name, Price = Price, Stock = Stock,Category = new Category("a",2),Item = new Item()};
+        return new Product() {Name = Name, Price = Price, Stock = Stock,Category = new Category { },Item = new Item()};
 
     }
 }
@@ -45,6 +45,7 @@ public class ProductResponse
             return false;
         }
         return Id == productResponse.Id &&
+            Name == productResponse.Name &&
                CreatedAt == productResponse.CreatedAt &&
                CreatedBy == productResponse.CreatedBy &&
                LastUpdatedAt == productResponse.LastUpdatedAt &&
@@ -64,6 +65,7 @@ public class ProductResponse
             return false;
         }
         return Id == productResponse.Id &&
+                Name == productResponse.Name &&
                CreatedAt == productResponse.CreatedAt &&
                CreatedBy == productResponse.CreatedBy &&
                LastUpdatedAt == productResponse.LastUpdatedAt &&
@@ -81,15 +83,32 @@ public class ProductResponse
     {
         return $"ProductResponse(Id: {Id}, Name: {Name}, Price: {Price}, Stock: {Stock}, Category: {Category?.Name})";
     }
+    public ProductUpdateRequest ProductUpdateRequest()
+    {
+        return new ProductUpdateRequest()
+        {
+            Id = Id,
+            Name = Name,
+            Category = Category,
+            Stock = Stock,
+            Price = Price
+        };
+    }
+    public Product Mock()
+    {
+        return new Product() { Name = Name, Price = Price, Stock = Stock, Category = Category.ToRequestCategory().ToCategory(), Item = Item };
+
+    }
 }
 
-    public static class ProductExtensions 
+public static class ProductExtensions 
 {
     public static ProductResponse ToProductResponse(this Product product)//convierte el product a productResponse
     {
         return new ProductResponse()
         {
             Id = product.Id,
+            Name = product.Name,
             CreatedAt = product.CreatedAt,
             CreatedBy = product.CreatedBy,
             LastUpdatedAt = product.LastUpdatedAt,
@@ -98,6 +117,33 @@ public class ProductResponse
             Category = product.Category.ToCategoryResponse(),
             Stock = product.Stock,
             Price = product.Price
+        };
+    }
+}
+
+public class ProductUpdateRequest
+{
+    [Required(ErrorMessage = "Id is required")]
+    public Guid Id { get; set; }
+    public string? Name { get; set; }
+    public CategoryResponse? Category { get; set; }
+    public Guid? CategoryId { get; set; }
+    public uint? Stock { get; set; }
+    [Required(ErrorMessage = "Price is required")]
+    [Range(0.01, double.MaxValue, ErrorMessage = "Price must be greater than zero")]
+    public decimal? Price { get; set; }
+
+    public Product ToProduct()
+    {
+        return new Product()
+        {
+            Id = Id,
+            Name = Name ?? string.Empty,
+            Price = Price ?? 0,
+            Stock = Stock ?? 0,
+            Category = Category?.ToRequestCategory().ToCategory(),
+         // Handle null Category
+            Item = new Item() // Assuming a default item if not provided
         };
     }
 }

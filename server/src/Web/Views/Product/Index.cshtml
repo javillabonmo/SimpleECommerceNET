@@ -1,0 +1,38 @@
+﻿
+@model IEnumerable<ProductResponse>
+
+@{
+	ViewBag.Title = "Products";
+}
+
+<main>
+	<h1>Lista de productos: </h1>
+
+	<table>
+		<thead>
+			<tr>
+				<th>Id</th>
+				<th>Nombre</th>
+				<th>Categoria</th>
+				<th>Precio</th>
+				<th>Stock</th>
+				<th>Creado el</th>
+				<th>Ultima actualizacion</th>
+			</tr>
+		</thead>
+		<tbody>
+			@foreach (ProductResponse product in Model)
+			{
+				<tr>
+					<td>@product.Id</td>
+					<td>@product.Name</td>
+					<td>@product.Category.Name</td>
+					<td>@product.Price.ToString("C")</td>
+					<td>@product.Stock</td>
+					<td>@product.CreatedAt.ToString("g")</td>
+					<td>@product.LastUpdatedAt.ToString("g")</td>
+				</tr>
+			}
+		</tbody>
+	</table>
+</main>

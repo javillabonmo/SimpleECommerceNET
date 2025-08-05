@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
+﻿
 using Application.DTOs;
 using Application.Services.Interfaces;
 using Domain.Entities.Sales;
@@ -21,11 +16,11 @@ public class CategoryService : ICategoryService
         // Aquí podrías inicializar una lista o un contexto de base de datos
         _categories = new List<Category>();
     }
-    public CategoryResponse AddCategory(RequestCategory? addCategoryRequest)
+    public CategoryResponse AddCategory(CategoryAddRequest? addCategoryRequest)
     {
         if(addCategoryRequest == null)
         {
-            throw new ArgumentNullException(nameof(addCategoryRequest), "RequestCategory cannot be null.");
+            throw new ArgumentNullException(nameof(addCategoryRequest), "CategoryAddRequest cannot be null.");
         }
         //convertir la solicitud a una entidad de dominio
         Category category = addCategoryRequest.ToCategory();
@@ -45,7 +40,11 @@ public class CategoryService : ICategoryService
 
     public CategoryResponse? GetCategoryByGuid(Guid guid)
     {
-        throw new NotImplementedException();
+        if (guid == Guid.Empty)
+        {
+            throw new ArgumentException("Guid cannot be empty.", nameof(guid));
+        }
+        return _categories.FirstOrDefault(category => category.Id == guid)?.ToCategoryResponse();
     }
 
     public CategoryResponse? GetCategoryById(int id)
@@ -58,7 +57,7 @@ public class CategoryService : ICategoryService
         return _categories.Select(c => c.ToCategoryResponse());
     }
 
-    public CategoryResponse? UpdateCategory(int id, RequestCategory? updateCategoryRequest)
+    public CategoryResponse? UpdateCategory(int id, CategoryAddRequest? updateCategoryRequest)
     {
         throw new NotImplementedException();
     }
