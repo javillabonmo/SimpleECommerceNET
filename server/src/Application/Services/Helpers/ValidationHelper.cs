@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace Application.Services.Helpers;
 public class ValidationHelper
 {
-    public static void Validate<T>(T obj)
+    internal static void Validate<T>(T obj)
     {
         ValidationContext validationContext = new ValidationContext(obj);
         List<ValidationResult> validationResults = new List<ValidationResult>();

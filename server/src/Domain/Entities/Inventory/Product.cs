@@ -10,9 +10,9 @@ public class Product : AuditableEntityBase
 {
     public Item Item { get; set; }
     public int ItemId { get; set; } 
-    public string Name { get; set; } = string.Empty;
+    public string ProductName { get; set; }
     public Category? Category { get; set; }
-    public int CategoryId { get; set; }
+    public Guid CategoryId { get; set; }
     public uint Stock { get; set; }
     public required decimal Price { get; set; }
 }

@@ -4,6 +4,6 @@ namespace Domain.Entities.Sales;
 
 public class Category:  AuditableEntityBase
 {
-    public string Name { get; set; } = string.Empty;
+    public string CategoryName { get; set; }
     public int Discount { get; set; }
 }

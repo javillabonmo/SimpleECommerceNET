@@ -1,13 +1,14 @@
-﻿
+﻿@using Application.DTOs.Enums
+
 @model IEnumerable<ProductResponse>
 
 @{
-	ViewBag.Title = "Products";
+	ViewBag.Title = "Productos";
 }
 
 <main>
 	<h1>Lista de productos: </h1>
-	<form action="/products" method="get">
+	<form asp-controller="product" asp-action="index" method="get">
 	<div>
 		<select class="form-input" name="searchBy">
 			@foreach(var field in ViewBag.SearchFields)
@@ -30,36 +31,68 @@
 	</div>
 	<div>
 		<button type="submit">Buscar</button>
-		<a href="/products">Limpiar Filtros</a>
+			<a asp-controller="product" asp-action="index">Limpiar Filtros</a>
+	</div>
+	<div>
+			<a asp-controller="product" asp-action="create">Añadir Producto</a>
+			
 	</div>
 	
 		<table>
 			<thead>
 				<tr>
-					<th>Id</th>
-					<th>Nombre</th>
-					<th>Categoria</th>
-					<th>Precio</th>
+					<th>Seleccionar</th>
+					@*<th>Id</th>*@
+					<th>
+						@await Html.PartialAsync("_GridColumnHeader", new ViewDataDictionary(ViewData)
+						{
+						{ "ColumnName",nameof(ProductResponse.ProductName)},
+						{ "ColumnDisplayName", "Nombre" },
+						
+						})
+					</th>
+					<th>
+						@await Html.PartialAsync("_GridColumnHeader", new ViewDataDictionary(ViewData)
+												{
+							{ "ColumnName",nameof(ProductResponse.Category.CategoryName)},
+												{ "ColumnDisplayName", "Categoria" },
+												})
+					</th>
+					<th>
+						@await Html.PartialAsync("_GridColumnHeader", new ViewDataDictionary(ViewData)
+												{
+							{ "ColumnName",nameof(ProductResponse.Price)},
+												{ "ColumnDisplayName", "Precio" },
+												})
+					</th>
 					<th>Stock</th>
 					<th>Creado el</th>
 					<th>Ultima actualizacion</th>
+
+					<th></th>
+					<td></td>
 				</tr>
 			</thead>
 			<tbody>
 				@foreach (ProductResponse product in Model)
 				{
 					<tr>
-						<td>@product.Id</td>
-						<td>@product.Name</td>
-						<td>@product.Category.Name</td>
+						<td><input type="checkbox"></td>
+						@*<td>@product.Id</td>*@
+						<td>@product.ProductName</td>
+						<td>@product.Category.CategoryName</td>
 						<td>@product.Price.ToString("C")</td>
 						<td>@product.Stock</td>
 						<td>@product.CreatedAt.ToString("g")</td>
 						<td>@product.LastUpdatedAt.ToString("g")</td>
+						<td><a asp-controller="product" asp-action="update" asp-route-id="@product.Id">Editar</a></td>
+						<td><a asp-comtroller="product" asp-action="delete" asp-route-id="@product.Id">Eliminar</a></td>
+						@*<td><a href="#">Eliminar</a></td>*@
 					</tr>
 				}
 			</tbody>
 		</table>
+		<a href="#">Eliminar Seleccionados</a>
 	
 	</form>
 	

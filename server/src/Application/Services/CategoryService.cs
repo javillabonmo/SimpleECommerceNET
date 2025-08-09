@@ -1,6 +1,10 @@
 ﻿
 using Application.DTOs;
 using Application.Services.Interfaces;
+using Application.Services.Mocks;
+
+
+using Domain.Entities.Inventory;
 using Domain.Entities.Sales;
 
 namespace Application.Services;
@@ -10,11 +14,19 @@ public class CategoryService : ICategoryService
 
 {
     private readonly List<Category> _categories;
-    public CategoryService()
+    public CategoryService(bool initialize = true)
     {
         // Simulando una base de datos en memoria
         // Aquí podrías inicializar una lista o un contexto de base de datos
         _categories = new List<Category>();
+        if (initialize)
+        {
+            foreach (Category category in CategoryMock.All())
+            {
+                // Convertir ProductResponse a Product y agregarlo a la lista
+                _categories.Add(category);
+            }
+        }
     }
     public CategoryResponse AddCategory(CategoryAddRequest? addCategoryRequest)
     {

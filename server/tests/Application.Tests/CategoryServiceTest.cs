@@ -23,7 +23,7 @@ public class CategoryServiceTest
     {
         // Arrange
       
-        CategoryAddRequest requestCategory = new CategoryAddRequest { Name = "Electronics" };
+        CategoryAddRequest requestCategory = new CategoryAddRequest { CategoryName = "Electronics" };
         
         // Act
         CategoryResponse category = _categoryService.AddCategory(requestCategory);

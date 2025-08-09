@@ -1,0 +1,71 @@
+﻿@model ProductRequest
+@{
+	ViewBag.Title = "Agregar Producto";
+}
+
+<a asp-controller="product" asp-action="index">Volver Atras</a>
+<h1>
+	Agregar Producto
+</h1>
+	<form asp-controller="product" asp-action="create" method="post">
+		<div>
+			<div>
+				<label asp-for="ProductName">
+					Nombre
+				</label>
+			</div>
+		
+			<div>
+				<input  asp-for="ProductName" />
+			<span asp-validation-for="ProductName" class="text-danger"></span>
+			</div>
+		</div>
+	<div>
+		<div>
+			<label asp-for="Stock">
+				Stock
+			</label>
+		</div>
+
+		<div>
+			<input type="number" asp-for="Stock" />
+			<span asp-validation-for="Stock" class="text-danger"></span>
+		</div>
+	</div>
+	<div>
+		<div>
+			<label asp-for="Price">
+				Precio
+			</label>
+		</div>
+
+		<div>
+			<input  asp-for="Price" />
+			<span asp-validation-for="Price" class="text-danger"></span>
+			
+		</div>
+	</div>
+	<div>
+		<div>
+			<label asp-for="CategoryId">
+				Categoria
+			</label>
+		</div>
+		<div>
+			<select asp-for="CategoryId" asp-items="@ViewBag.Categories">
+				<option value="">Selecciona una Opcion...</option>
+			</select>
+			<span asp-validation-for="CategoryId" class="text-danger"></span>
+		</div>
+	</div>
+	<div asp-validation-summary="All">
+
+	</div>
+
+		<button type="submit">Guardar</button>
+	</form>
+
+@section Scripts {
+	@await Html.PartialAsync("_ValidationScriptsPartial")
+	<script></script>
+}

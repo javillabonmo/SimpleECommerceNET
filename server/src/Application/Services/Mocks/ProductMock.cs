@@ -7,124 +7,58 @@ using System.Threading.Tasks;
 using Application.DTOs;
 using Application.Services.Helpers;
 
+using Domain.Entities.Inventory;
+using Domain.Entities.Sales;
+
 namespace Application.Services.Mocks;
 public static class ProductMock
 {
     #region productsMock
 
-    public static ProductRequest ProductAddRequest()
-    {
-        return new ProductRequest
-        {
-            Name = "Producto Nuevo",
-            Price = 99.99m,
-            Stock = 10,
-            CategoryId = Guid.Parse("11111111-1111-1111-1111-111111111111")
-        };
-    }
+    
 
-    public static ProductUpdateRequest ProductUpdateRequest(Guid productId)
+    public static List<Product> All()
     {
-        return new ProductUpdateRequest
-        {
-            Id = productId,
-            Name = "Producto Actualizado",
-            Price = 149.99m,
-            Stock = 20,
-            CategoryId = Guid.Parse("22222222-2222-2222-2222-222222222222")
-        };
-    }
-
-    public static List<ProductResponse> All()
-    {
-        return new List<ProductResponse>
+        return new List<Product>
             {
-                new ProductResponse
+                new Product
                 {
-                    Id = Guid.NewGuid(),
-                    Name = "Producto 1",
+                    Id = Guid.Parse("581ff516-be77-4907-afe2-e323d84d08d9"),
+                    ProductName = "Producto 1",
                     Price = 50.00m,
                     Stock = 100,
-                    Category = new CategoryResponse
-                    {
-                        Id = Guid.NewGuid(),
-                        Name = "Categoria 1",
-                        Discount = 10,
-                        CreatedAt = DateTime.Now,
-                        LastUpdatedAt = DateTime.Now
-                    },
+                    Category = CategoryMock.GetCategoryByName("Categoria 1"),
+                    CategoryId = CategoryMock.GetCategoryByName("Categoria 1").Id,
                     CreatedAt = DateTime.Now,
                     LastUpdatedAt = DateTime.Now
                 },
-                new ProductResponse
+                new Product
                 {
-                    Id = Guid.NewGuid(),
-                    Name = "Producto 2",
+                    Id =Guid.Parse("d4fbcc41-2ac8-4535-9222-6acee1d4e4a8"),
+                    ProductName = "Producto 2",
                     Price = 75.00m,
                     Stock = 200,
-                    Category = new CategoryResponse
-                    {
-                        Id = Guid.NewGuid(),
-                        Name = "Categoria 2",
-                        Discount = 15,
-                        CreatedAt = DateTime.Now,
-                        LastUpdatedAt = DateTime.Now
-                    },
+                    Category =CategoryMock.GetCategoryByName("Categoria 2"),
+                    CategoryId = CategoryMock.GetCategoryByName("Categoria 2").Id,
                     CreatedAt = DateTime.Now,
                     LastUpdatedAt = DateTime.Now
                 },
-                new ProductResponse
+                new Product
                 {
-                    Id = Guid.NewGuid(),
-                    Name = "nombre camel2",
+                    Id =Guid.Parse("5ccbba0e-b2b5-4614-a947-85fb4dd375f5"),
+                    ProductName = "Producto 3",
                     Price = 75.00m,
                     Stock = 200,
-                    Category = new CategoryResponse
-                    {
-                        Id = Guid.NewGuid(),
-                        Name = "rara",
-                        Discount = 15,
-                        CreatedAt = DateTime.Now,
-                        LastUpdatedAt = DateTime.Now
-                    },
+                    Category = CategoryMock.GetCategoryByName("Categoria 3"),
+                    CategoryId = CategoryMock.GetCategoryByName("Categoria 3").Id,
                     CreatedAt = DateTime.Now,
                     LastUpdatedAt = DateTime.Now
                 }
             };
     }
 
-    public static List<ProductResponse> ProductsFromJson()
-    {
-        string products = """
-            [
-                {
-                    "Id": "11111111-1111-1111-1111-111111111111",
-                    "Name": "Producto 1",
-                    "Price": 50.00,
-                    "Stock": 100,
-                    "Category": {
-                        "Id": "22222222-2222-2222-2222-222222222222",
-                        "Name": "Categoria 1",
-                        "Discount": 10,
-                        "CreatedAt": "2023-10-01T00:00:00Z",
-                        "LastUpdatedAt": "2023-10-01T00:00:00Z"
-                    },
-                    "CreatedAt": "2023-10-01T00:00:00Z",
-                    "LastUpdatedAt": "2023-10-01T00:00:00Z"
-                }
-            ]
-            """;
-
-        List<ProductResponse>? JsonMock = Deserialize.Json<ProductResponse>(products);
-        if (JsonMock is null)
-        {
-            return new List<ProductResponse>();
-        }
-        else
-        {
-            return JsonMock;
-        }
-    }
+  
+    
     #endregion
 }
 

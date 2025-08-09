@@ -8,7 +8,7 @@ namespace Application.Services.Interfaces;
  *
  * 1. validaciones de negocio y seguridad
  * 2. logica de validacion independiente del objeto
- * Name: No puede ser nulo o vacío
+ * ProductName: No puede ser nulo o vacío
  * Price No puede ser menor o igual a cero
  * el Stock debe ser mayor o igual a cero
  * el Category debe existir

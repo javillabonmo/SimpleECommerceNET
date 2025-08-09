@@ -8,15 +8,20 @@ namespace Application.DTOs;
 public class ProductRequest 
 {   
     Item Item { get; set; }
-    public string Name { get; set; } = string.Empty;
-    public CategoryResponse Category { get; set; }
+    [DataType(DataType.Text)]
+    public string ProductName { get; set; } = string.Empty;
+    public Category? Category { get; set; }
     public Guid CategoryId { get; set; }
+    
     public uint Stock { get; set; }
+    [Required(ErrorMessage = "Price is required")]
+    [Range(0.01, double.MaxValue, ErrorMessage = "Price must be greater than zero")]
+    [DataType(DataType.Currency)]
     public required decimal Price { get; set; }
 
     public Product ToProduct()
     {
-        return new Product() {Name = Name, Price = Price, Stock = Stock,Category = new Category { },Item = new Item()};
+        return new Product() {ProductName = ProductName, Price = Price, Stock = Stock, Category = Category,CategoryId = CategoryId,Item = new Item()};
 
     }
 }
@@ -29,12 +34,12 @@ public class ProductResponse
     public DateTime LastUpdatedAt { get; set; }
     public Guid LastUpdatedBy { get; set; }
     public Item Item { get; set; }
-    public string Name { get; set; } = string.Empty;
-    public CategoryResponse Category { get; set; }
+    public string ProductName { get; set; }
+    public Category Category { get; set; }
+    public Guid CategoryId { get; set; }
 
     public uint Stock { get; set; }
-    [Required(ErrorMessage = "Price is required")]
-    [Range(0.01, double.MaxValue, ErrorMessage = "Price must be greater than zero")]
+    
 
     public required decimal Price { get; set; }
 
@@ -45,7 +50,7 @@ public class ProductResponse
             return false;
         }
         return Id == productResponse.Id &&
-            Name == productResponse.Name &&
+            ProductName == productResponse.ProductName &&
                CreatedAt == productResponse.CreatedAt &&
                CreatedBy == productResponse.CreatedBy &&
                LastUpdatedAt == productResponse.LastUpdatedAt &&
@@ -58,45 +63,30 @@ public class ProductResponse
         //return base.Equals(obj);
     }
 
-    public bool EqualsTo(ProductResponse? obj)//compara dos objetos de tipo ProductResponse especifcmente en sus valores y no en su referencia
-    {
-        if (obj is not ProductResponse productResponse)
-        {
-            return false;
-        }
-        return Id == productResponse.Id &&
-                Name == productResponse.Name &&
-               CreatedAt == productResponse.CreatedAt &&
-               CreatedBy == productResponse.CreatedBy &&
-               LastUpdatedAt == productResponse.LastUpdatedAt &&
-               LastUpdatedBy == productResponse.LastUpdatedBy &&
-               Item.Equals(productResponse.Item) &&
-               Category.Equals(productResponse.Category) &&
-               Stock == productResponse.Stock &&
-               Price == productResponse.Price;
-    }
+    
     public override int GetHashCode()
     {
         return base.GetHashCode();
     }
     public override string ToString()
     {
-        return $"ProductResponse(Id: {Id}, Name: {Name}, Price: {Price}, Stock: {Stock}, Category: {Category?.Name})";
+        return $"ProductResponse(Id: {Id}, ProductName: {ProductName}, Price: {Price}, Stock: {Stock}, Category: {Category?.CategoryName})";
     }
-    public ProductUpdateRequest ProductUpdateRequest()
+    public ProductUpdateRequest ToProductUpdateRequest()
     {
         return new ProductUpdateRequest()
         {
             Id = Id,
-            Name = Name,
+            ProductName = ProductName,
             Category = Category,
+            CategoryId = CategoryId,
             Stock = Stock,
             Price = Price
         };
     }
-    public Product Mock()
+    public Product ToProduct()
     {
-        return new Product() { Name = Name, Price = Price, Stock = Stock, Category = Category.ToRequestCategory().ToCategory(), Item = Item };
+        return new Product() { Id = Id, ProductName = ProductName, Price = Price, Stock = Stock, Category = Category,CategoryId = CategoryId, Item = Item };
 
     }
 }
@@ -108,13 +98,14 @@ public static class ProductExtensions
         return new ProductResponse()
         {
             Id = product.Id,
-            Name = product.Name,
+            ProductName = product.ProductName,
             CreatedAt = product.CreatedAt,
             CreatedBy = product.CreatedBy,
             LastUpdatedAt = product.LastUpdatedAt,
             LastUpdatedBy = product.LastUpdatedBy,
             Item = product.Item,
-            Category = product.Category.ToCategoryResponse(),
+            Category = product.Category,
+            CategoryId = product.CategoryId,
             Stock = product.Stock,
             Price = product.Price
         };
@@ -125,9 +116,9 @@ public class ProductUpdateRequest
 {
     [Required(ErrorMessage = "Id is required")]
     public Guid Id { get; set; }
-    public string? Name { get; set; }
-    public CategoryResponse? Category { get; set; }
-    public Guid? CategoryId { get; set; }
+    public string? ProductName { get; set; }
+    public Category? Category { get; set; }
+    public Guid CategoryId { get; set; }
     public uint? Stock { get; set; }
     [Required(ErrorMessage = "Price is required")]
     [Range(0.01, double.MaxValue, ErrorMessage = "Price must be greater than zero")]
@@ -138,11 +129,12 @@ public class ProductUpdateRequest
         return new Product()
         {
             Id = Id,
-            Name = Name ?? string.Empty,
+            ProductName = ProductName ?? string.Empty,
             Price = Price ?? 0,
             Stock = Stock ?? 0,
-            Category = Category?.ToRequestCategory().ToCategory(),
-         // Handle null Category
+            Category = Category,
+            CategoryId = CategoryId,
+            // Handle null Category
             Item = new Item() // Assuming a default item if not provided
         };
     }
