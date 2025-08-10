@@ -1,0 +1,42 @@
+﻿@model ProductResponse
+@{
+	ViewBag.Title = "Eliminar Producto";
+}
+<h1>
+	Eliminar Producto(s)
+</h1>
+<p>Estas seguro de eliminar?</p>
+
+<form asp-controller="Product" asp-action="Delete" method="post">
+	<input type="hidden" asp-for="Id" />
+	<div>
+		<div>
+			<label asp-for="ProductName">
+				Nombre
+			</label>
+		</div>
+
+		<div>
+			<input asp-for="ProductName" disabled="disabled" />
+			<span asp-validation-for="ProductName" class="text-danger"></span>
+		</div>
+	</div>
+	<div>
+		<div>
+			<label asp-for="Price">
+				Precio
+			</label>
+		</div>
+
+		<div>
+			<input asp-for="Price" disabled="disabled" />
+			<span asp-validation-for="Price" class="text-danger"></span>
+
+		</div>
+	</div>
+	<button>Eliminar</button>
+</form>
+<p>
+	
+	<a asp-controller="Product" asp-action="Index" class="btn btn-secondary">Cancelar</a>
+

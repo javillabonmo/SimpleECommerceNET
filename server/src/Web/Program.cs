@@ -1,7 +1,17 @@
+// <copyright file="Program.cs" company="tbrzc">
+// Copyright (c) PlaceholderCompany. All rights reserved.
+// </copyright>
+
+using Application.Services;
+using Application.Services.Interfaces;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+builder.Services.AddSingleton<IProductService, ProductService>();
+builder.Services.AddSingleton<ICategoryService, CategoryService>();
 
 var app = builder.Build();
 
