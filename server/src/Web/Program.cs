@@ -1,3 +1,7 @@
+// <copyright file="Program.cs" company="tbrzc">
+// Copyright (c) PlaceholderCompany. All rights reserved.
+// </copyright>
+
 using Application.Services;
 using Application.Services.Interfaces;
 

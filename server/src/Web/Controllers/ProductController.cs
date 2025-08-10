@@ -1,4 +1,8 @@
-﻿using Application.DTOs;
+﻿// <copyright file="ProductController.cs" company="PlaceholderCompany">
+// Copyright (c) PlaceholderCompany. All rights reserved.
+// </copyright>
+
+using Application.DTOs;
 using Application.DTOs.Enums;
 using Application.Services.Interfaces;
 
@@ -89,14 +93,59 @@ public class ProductController : Controller
     [HttpPost]
     public IActionResult Update(ProductUpdateRequest productUpdateRequest)
     {
-        return View();
+        ProductResponse? productResponse= _productService.GetProductById(productUpdateRequest.Id);
+        if (productResponse == null)
+        {
+            //NotFound();
+            return RedirectToAction("Index", "Product");
+        }
+        if (ModelState.IsValid)
+        {
+            _productService.UpdateProduct(productUpdateRequest);
+            return RedirectToAction("Index", "Product");
+        }
+        else
+        {
+            ProductUpdateRequest product = productResponse.ToProductUpdateRequest();
+            List<CategoryResponse> categories = _categoryService.GetCategories().ToList();
+            ViewBag.Categories = categories.Select(category => new SelectListItem { Text = category.CategoryName, Value = category.Id.ToString() });
+            ViewBag.Errors = ModelState.Values.SelectMany(value => value.Errors).Select(e => e.ErrorMessage).ToList();
+            return View(productResponse.ToProductUpdateRequest());
+        }
+            
     }
-    
+
     [Route("[action]/{id}")]
+    [HttpGet]
     public IActionResult Delete(Guid id)
     {
-       
-        return View();
+
+        ProductResponse? productResponse = _productService.GetProductById(id);
+        if (productResponse == null)
+        {
+            return RedirectToAction("Index", "Product");
+        }
+
+
+        return View(productResponse);
     }
-    
+    [Route("[action]/{id}")]
+    [HttpPost]
+    public IActionResult Delete(ProductUpdateRequest productUpdateRequest)
+    {
+        ProductResponse? productResponse = _productService.GetProductById(productUpdateRequest.Id);
+        if (productResponse == null)
+        {
+            //NotFound();
+            return RedirectToAction("Index", "Product");
+        }
+        
+        
+            _productService.DeleteProduct(productUpdateRequest.Id);
+            return RedirectToAction("Index", "Product");
+        
+       
+        
+    }
+
 }

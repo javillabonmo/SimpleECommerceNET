@@ -59,7 +59,15 @@
 		</div>
 	</div>
 	<div asp-validation-summary="All">
-
+		@if (ViewBag.Errors != null)
+		{
+			<ul>
+				@foreach (string error in ViewBag.Errors)
+				{
+					<li>@error</li>
+				}
+			</ul>
+		}
 	</div>
 
 		<button type="submit">Guardar</button>

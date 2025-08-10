@@ -188,7 +188,7 @@ public class ProductService : IProductService
         if (productUpdateRequest == null) {
             return null; // or throw an exception if you prefer
         }
-        ValidationHelper.Validate(productUpdateRequest);
+        
         if (productUpdateRequest.Id == Guid.Empty)
         {
             throw new ArgumentException("Product ID cannot be empty.", nameof(productUpdateRequest.Id));
@@ -202,18 +202,19 @@ public class ProductService : IProductService
 
         ValidationHelper.Validate(productUpdateRequest);
 
-        ProductUpdateRequest productToUpdate = productUpdateRequest;
+
 
         // Update the product properties
-        productToUpdate.ProductName = productUpdateRequest.ProductName ?? existingProduct.ProductName;
+        existingProduct.ProductName = productUpdateRequest.ProductName ?? existingProduct.ProductName;
 
-        productToUpdate.Price = productUpdateRequest.Price > 0 ? productUpdateRequest.Price : existingProduct.Price;
+        existingProduct.Price = productUpdateRequest.Price > 0 ? productUpdateRequest.Price : existingProduct.Price;
 
-        productToUpdate.Stock = productUpdateRequest.Stock >= 0 ? productUpdateRequest.Stock : existingProduct.Stock;
-        //productToUpdate.Category = productUpdateRequest.Category ?? existingProduct.Category.ToCategoryResponse();
-        // Convert the updated request back to a Product entity
-        Product updatedProduct = productToUpdate.ToProduct();
+        existingProduct.Stock = productUpdateRequest.Stock >= 0 ? productUpdateRequest.Stock : existingProduct.Stock;
+        existingProduct.Category = productUpdateRequest.Category ?? existingProduct.Category;
+        
 
-        return updatedProduct.ToProductResponse();
+     
+
+        return existingProduct.ToProductResponse();
     }
 }

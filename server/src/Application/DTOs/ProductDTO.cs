@@ -116,22 +116,22 @@ public class ProductUpdateRequest
 {
     [Required(ErrorMessage = "Id is required")]
     public Guid Id { get; set; }
-    public string? ProductName { get; set; }
+    public string ProductName { get; set; }
     public Category? Category { get; set; }
     public Guid CategoryId { get; set; }
-    public uint? Stock { get; set; }
+    public uint Stock { get; set; }
     [Required(ErrorMessage = "Price is required")]
     [Range(0.01, double.MaxValue, ErrorMessage = "Price must be greater than zero")]
-    public decimal? Price { get; set; }
+    public decimal Price { get; set; }
 
     public Product ToProduct()
     {
         return new Product()
         {
             Id = Id,
-            ProductName = ProductName ?? string.Empty,
-            Price = Price ?? 0,
-            Stock = Stock ?? 0,
+            ProductName = ProductName,
+            Price = Price,
+            Stock = Stock,
             Category = Category,
             CategoryId = CategoryId,
             // Handle null Category
