@@ -1,9 +1,14 @@
-// <copyright file="Program.cs" company="tbrzc">
-// Copyright (c) PlaceholderCompany. All rights reserved.
+// <copyright file="Program.cs" company="N/A">
+// Copyright (c) N/A. All rights reserved.
 // </copyright>
+// <author> javillabonmo </author>
 
 using Application.Services;
 using Application.Services.Interfaces;
+
+using Infraestructure.Persistence;
+
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,6 +17,12 @@ builder.Services.AddControllersWithViews();
 
 builder.Services.AddSingleton<IProductService, ProductService>();
 builder.Services.AddSingleton<ICategoryService, CategoryService>();
+
+builder.Services.AddDbContext<UsersDbContext>(options =>
+{
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+});
+
 
 var app = builder.Build();
 
@@ -27,16 +38,13 @@ if (!app.Environment.IsDevelopment())
 app.UseRouting();
 app.UseStaticFiles();
 
-
 //app.UseAuthorization();
 
 //app.MapStaticAssets();
 
- app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}")
-    .WithStaticAssets();
-
-    
+app.MapControllerRoute(
+   name: "default",
+   pattern: "{controller=Home}/{action=Index}/{id?}")
+   .WithStaticAssets();
 
 app.Run();

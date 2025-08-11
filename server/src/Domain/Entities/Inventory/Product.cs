@@ -1,18 +1,49 @@
-﻿using Domain.Entities.Common;
-using Domain.Entities.Sales;
+﻿// <copyright file="Product.cs" company="N/A">
+// Copyright (c) N/A. All rights reserved.
+// </copyright>
+// <author> javillabonmo </author>
 
-namespace Domain.Entities.Inventory;
-
-///<summary>
-/// Represents a product in the inventory. 
-///</summary>
-public class Product : AuditableEntityBase
+namespace Domain.Entities.Inventory
 {
-    public Item Item { get; set; }
-    public int ItemId { get; set; } 
-    public string ProductName { get; set; }
-    public Category? Category { get; set; }
-    public Guid CategoryId { get; set; }
-    public uint Stock { get; set; }
-    public required decimal Price { get; set; }
+    using System.ComponentModel.DataAnnotations;
+
+    using Domain.Entities.Common;
+    using Domain.Entities.Sales;
+
+    /// <summary>
+    /// Defines the <see cref="Product" />
+    /// </summary>
+    public class Product : AuditableEntityBase
+    {
+        /// <summary>
+        /// Gets or sets the ProductId
+        /// </summary>
+        [Key]
+        public Guid ProductId { get; set; }
+
+        /// <summary>
+        /// Gets or sets the ProductName
+        /// </summary>
+        public string ProductName { get; set; }
+
+        /// <summary>
+        /// Gets or sets the Category
+        /// </summary>
+        public Category? Category { get; set; }
+
+        /// <summary>
+        /// Gets or sets the CategoryId
+        /// </summary>
+        public Guid CategoryId { get; set; }
+
+        /// <summary>
+        /// Gets or sets the Stock
+        /// </summary>
+        public uint Stock { get; set; }
+
+        /// <summary>
+        /// Gets or sets the Price
+        /// </summary>
+        public required decimal Price { get; set; }
+    }
 }

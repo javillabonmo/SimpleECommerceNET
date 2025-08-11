@@ -1,141 +1,131 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-using Domain.Entities.Common;
-using Domain.Entities.Inventory;
-using Domain.Entities.Sales;
-
-namespace Application.DTOs;
-public class ProductRequest 
-{   
-    Item Item { get; set; }
-    [DataType(DataType.Text)]
-    public string ProductName { get; set; } = string.Empty;
-    public Category? Category { get; set; }
-    public Guid CategoryId { get; set; }
-    
-    public uint Stock { get; set; }
-    [Required(ErrorMessage = "Price is required")]
-    [Range(0.01, double.MaxValue, ErrorMessage = "Price must be greater than zero")]
-    [DataType(DataType.Currency)]
-    public required decimal Price { get; set; }
-
-    public Product ToProduct()
-    {
-        return new Product() {ProductName = ProductName, Price = Price, Stock = Stock, Category = Category,CategoryId = CategoryId,Item = new Item()};
-
-    }
-}
-
-public class ProductResponse
+﻿namespace Application.DTOs
 {
-    public Guid Id { get; set; }
-    public DateTime CreatedAt { get; set; }
-    public Guid CreatedBy { get; set; }
-    public DateTime LastUpdatedAt { get; set; }
-    public Guid LastUpdatedBy { get; set; }
-    public Item Item { get; set; }
-    public string ProductName { get; set; }
-    public Category Category { get; set; }
-    public Guid CategoryId { get; set; }
+    using System.ComponentModel.DataAnnotations;
 
-    public uint Stock { get; set; }
-    
+    using Domain.Entities.Common;
+    using Domain.Entities.Inventory;
+    using Domain.Entities.Sales;
 
-    public required decimal Price { get; set; }
 
-    public override bool Equals(object? obj)
+    public class ProductAddRequest
     {
-        if (obj is not ProductResponse productResponse)
+
+        [DataType(DataType.Text)]
+        public string ProductName { get; set; } = string.Empty;
+
+        public Category? Category { get; set; }
+
+        public Guid CategoryId { get; set; }
+
+        public uint Stock { get; set; }
+
+        [Required(ErrorMessage = "Price is required")]
+        [Range(0.01, double.MaxValue, ErrorMessage = "Price must be greater than zero")]
+        [DataType(DataType.Currency)]
+        public decimal Price { get; set; }
+
+        public Product ToProduct()
         {
-            return false;
+            return new Product() { ProductName = ProductName, Price = Price, Stock = Stock, Category = Category, CategoryId = CategoryId };
+
         }
-        return Id == productResponse.Id &&
-            ProductName == productResponse.ProductName &&
-               CreatedAt == productResponse.CreatedAt &&
-               CreatedBy == productResponse.CreatedBy &&
-               LastUpdatedAt == productResponse.LastUpdatedAt &&
-               LastUpdatedBy == productResponse.LastUpdatedBy &&
-               Item.Equals(productResponse.Item) &&
-               Category.Equals(productResponse.Category) &&
-               Stock == productResponse.Stock &&
-               Price == productResponse.Price;
-
-        //return base.Equals(obj);
     }
 
-    
-    public override int GetHashCode()
+    public class ProductResponse : IAuditableEntityBase
     {
-        return base.GetHashCode();
-    }
-    public override string ToString()
-    {
-        return $"ProductResponse(Id: {Id}, ProductName: {ProductName}, Price: {Price}, Stock: {Stock}, Category: {Category?.CategoryName})";
-    }
-    public ProductUpdateRequest ToProductUpdateRequest()
-    {
-        return new ProductUpdateRequest()
+        public Guid ProductId { get; set; }
+
+        public string ProductName { get; set; }
+
+        public Category Category { get; set; }
+
+        public Guid CategoryId { get; set; }
+
+        public uint Stock { get; set; }
+
+        public decimal Price { get; set; }
+
+        public DateTime CreatedAt { get; set; }
+
+        public Guid CreatedBy { get; set; }
+
+        public DateTime LastUpdatedAt { get; set; }
+
+        public Guid LastUpdatedBy { get; set; }
+
+        public override bool Equals(object? obj)
         {
-            Id = Id,
-            ProductName = ProductName,
-            Category = Category,
-            CategoryId = CategoryId,
-            Stock = Stock,
-            Price = Price
-        };
-    }
-    public Product ToProduct()
-    {
-        return new Product() { Id = Id, ProductName = ProductName, Price = Price, Stock = Stock, Category = Category,CategoryId = CategoryId, Item = Item };
+            if (obj is not ProductResponse productResponse)
+            {
+                return false;
+            }
+            return ProductId == productResponse.ProductId &&
+                ProductName == productResponse.ProductName &&
 
-    }
-}
+                   Category.Equals(productResponse.Category) &&
+                    CategoryId == productResponse.CategoryId &&
+                   Stock == productResponse.Stock &&
+                   Price == productResponse.Price &&
+            CreatedAt == productResponse.CreatedAt &&
+                   CreatedBy == productResponse.CreatedBy &&
+                   LastUpdatedAt == productResponse.LastUpdatedAt &&
+                   LastUpdatedBy == productResponse.LastUpdatedBy;
 
-public static class ProductExtensions 
-{
-    public static ProductResponse ToProductResponse(this Product product)//convierte el product a productResponse
-    {
-        return new ProductResponse()
+            //return base.Equals(obj);
+        }
+
+
+        public override int GetHashCode()
         {
-            Id = product.Id,
-            ProductName = product.ProductName,
-            CreatedAt = product.CreatedAt,
-            CreatedBy = product.CreatedBy,
-            LastUpdatedAt = product.LastUpdatedAt,
-            LastUpdatedBy = product.LastUpdatedBy,
-            Item = product.Item,
-            Category = product.Category,
-            CategoryId = product.CategoryId,
-            Stock = product.Stock,
-            Price = product.Price
-        };
-    }
-}
+            return base.GetHashCode();
+        }
 
-public class ProductUpdateRequest
-{
-    [Required(ErrorMessage = "Id is required")]
-    public Guid Id { get; set; }
-    public string ProductName { get; set; }
-    public Category? Category { get; set; }
-    public Guid CategoryId { get; set; }
-    public uint Stock { get; set; }
-    [Required(ErrorMessage = "Price is required")]
-    [Range(0.01, double.MaxValue, ErrorMessage = "Price must be greater than zero")]
-    public decimal Price { get; set; }
-
-    public Product ToProduct()
-    {
-        return new Product()
+        public override string ToString()
         {
-            Id = Id,
-            ProductName = ProductName,
-            Price = Price,
-            Stock = Stock,
-            Category = Category,
-            CategoryId = CategoryId,
-            // Handle null Category
-            Item = new Item() // Assuming a default item if not provided
-        };
+            return $"ProductResponse(ProductId: {ProductId}, ProductName: {ProductName}, Price: {Price}, Stock: {Stock}, Category: {Category?.CategoryName})";
+        }
+
+        public ProductUpdateRequest ToProductUpdateRequest()
+        {
+            return new ProductUpdateRequest()
+            {
+                ProductId = ProductId,
+                ProductName = ProductName,
+                Category = Category,
+                CategoryId = CategoryId,
+                Stock = Stock,
+                Price = Price
+            };
+        }
+
+
+    }
+
+
+
+    public class ProductUpdateRequest : ProductAddRequest
+    {
+        [Required(ErrorMessage = "ProductId is required")]
+        public Guid ProductId { get; set; }
+    }
+
+    public static class ProductExtensions
+    {
+        public static ProductResponse ToProductResponse(this Product product)//convierte el product a productResponse
+        {
+            return new ProductResponse()
+            {
+                ProductId = product.ProductId,
+                ProductName = product.ProductName,
+                CreatedAt = product.CreatedAt,
+                CreatedBy = product.CreatedBy,
+                LastUpdatedAt = product.LastUpdatedAt,
+                LastUpdatedBy = product.LastUpdatedBy,
+                Category = product.Category,
+                CategoryId = product.CategoryId,
+                Stock = product.Stock,
+                Price = product.Price
+            };
+        }
     }
 }

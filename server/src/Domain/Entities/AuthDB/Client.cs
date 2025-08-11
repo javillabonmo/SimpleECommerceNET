@@ -4,5 +4,5 @@ namespace Domain.Entities.AuthDB;
 
 public class Client : User
 {
-    Order  Order { get; set; }
+    Order Order { get; set; }
 }

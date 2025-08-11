@@ -1,13 +1,35 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿// <copyright file="AuditableEntityBase.cs" company="N/A">
+// Copyright (c) N/A. All rights reserved.
+// </copyright>
+// <author> javillabonmo </author>
 
-namespace Domain.Entities.Common;
-
-public abstract class AuditableEntityBase
+namespace Domain.Entities.Common
 {
-    [Required]
-    public Guid Id { get; set; }
-    public DateTime CreatedAt { get; set; } 
-    public Guid CreatedBy { get; set; } 
-    public DateTime LastUpdatedAt { get; set; }
-    public Guid LastUpdatedBy { get; set; }
+    using System.ComponentModel.DataAnnotations;
+
+    /// <summary>
+    /// Defines the <see cref="AuditableEntityBase" />
+    /// </summary>
+    public abstract class AuditableEntityBase
+    {
+        /// <summary>
+        /// Gets or sets the CreatedAt.
+        /// </summary>
+        public DateTime CreatedAt { get; set; }
+
+        /// <summary>
+        /// Gets or sets the CreatedBy.
+        /// </summary>
+        public Guid CreatedBy { get; set; }
+
+        /// <summary>
+        /// Gets or sets the LastUpdatedAt.
+        /// </summary>
+        public DateTime LastUpdatedAt { get; set; }
+
+        /// <summary>
+        /// Gets or sets the LastUpdatedBy.
+        /// </summary>
+        public Guid LastUpdatedBy { get; set; }
+    }
 }

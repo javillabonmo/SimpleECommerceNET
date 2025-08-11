@@ -85,8 +85,8 @@
 						<td>@product.Stock</td>
 						<td>@product.CreatedAt.ToString("g")</td>
 						<td>@product.LastUpdatedAt.ToString("g")</td>
-						<td><a asp-controller="product" asp-action="update" asp-route-id="@product.Id">Editar</a></td>
-						<td><a asp-comtroller="product" asp-action="delete" asp-route-id="@product.Id">Eliminar</a></td>
+						<td><a asp-controller="product" asp-action="update" asp-route-id="@product.ProductId">Editar</a></td>
+						<td><a asp-comtroller="product" asp-action="delete" asp-route-id="@product.ProductId">Eliminar</a></td>
 						@*<td><a href="#">Eliminar</a></td>*@
 					</tr>
 				}

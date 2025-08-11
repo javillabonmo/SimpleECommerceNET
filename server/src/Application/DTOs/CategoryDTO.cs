@@ -1,87 +1,100 @@
 ﻿
-using Domain.Entities.Sales;
 
-namespace Application.DTOs;
-public class CategoryAddRequest
+namespace Application.DTOs
 {
-    public string CategoryName { get; set; } = string.Empty;
-    public int Discount { get; set; } = 20;
-    public Category ToCategory()
-    {
-        return new Category
-        {
-            CategoryName = CategoryName,
-            Discount = Discount
-        };
-    }
-    
-}
+    using System.ComponentModel.DataAnnotations;
 
-public class CategoryResponse
-{
-    public Guid Id { get; set; }
-    public string CategoryName { get; set;}
-    public int Discount { get; set; } 
-    public DateTime CreatedAt { get; set; }
-    public DateTime LastUpdatedAt { get; set; }
-    public override bool Equals(object? obj)
+    using Domain.Entities.Common;
+    using Domain.Entities.Sales;
+
+    public class CategoryAddRequest
     {
-        if (obj is not CategoryResponse responseCategory)
+        public string CategoryName { get; set; } = string.Empty;
+        public int Discount { get; set; } = 20;
+        public Category ToCategory()
         {
-            return false;
+            return new Category
+            {
+                CategoryName = CategoryName,
+                Discount = Discount
+            };
         }
-        return Id == responseCategory.Id &&
-               CategoryName == responseCategory.CategoryName &&
-               Discount == responseCategory.Discount &&
-               CreatedAt == responseCategory.CreatedAt &&
-               LastUpdatedAt == responseCategory.LastUpdatedAt;
-    }
-    
 
-    public override int GetHashCode()
-    {
-        return base.GetHashCode();
-    }
-    public override string ToString()
-    {
-        return $"Id: {Id}, ProductName: {CategoryName}, Discount: {Discount}, CreatedAt: {CreatedAt}, LastUpdatedAt: {LastUpdatedAt}";
-    }
-    public Category ToCategory()
-    {
-        return new Category
-        {
-            Id = Id,
-            CategoryName = CategoryName,
-            Discount = Discount
-        };
     }
 
-}
-public class CategoryUpdateRequest : CategoryAddRequest
-{
-    public Guid Id { get; set; }
-    public Category ToCategory()
+    public class CategoryResponse : IAuditableEntityBase
     {
-        return new Category
-        {
-            Id = Id,
-            CategoryName = CategoryName,
-            Discount = Discount
-        };
-    }
-}
+        public Guid CategoryId { get; set; }
 
-public static class CategoryExtensions
-{
-    public static CategoryResponse ToCategoryResponse(this Category category)
-    {
-        return new CategoryResponse()
+        public string CategoryName { get; set; }
+
+        public int Discount { get; set; }
+
+        public DateTime CreatedAt { get; set; }
+
+        public Guid CreatedBy { get; set; }
+
+        public DateTime LastUpdatedAt { get; set; }
+
+        public Guid LastUpdatedBy { get; set; }
+        public override bool Equals(object? obj)
         {
-            Id = category.Id,
-            CategoryName = category.CategoryName,
-            Discount = category.Discount,
-            CreatedAt = category.CreatedAt,
-            LastUpdatedAt = category.LastUpdatedAt
-        };
-    } 
+            if (obj is not CategoryResponse responseCategory)
+            {
+                return false;
+            }
+
+            return CategoryId == responseCategory.CategoryId &&
+                   CategoryName == responseCategory.CategoryName &&
+                   Discount == responseCategory.Discount &&
+                     CreatedAt == responseCategory.CreatedAt &&
+                     CreatedBy == responseCategory.CreatedBy &&
+                        LastUpdatedAt == responseCategory.LastUpdatedAt &&
+                        LastUpdatedBy == responseCategory.LastUpdatedBy;
+        }
+
+
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
+        }
+
+        public override string ToString()
+        {
+            return $"ProductId: {CategoryId}, ProductName: {CategoryName}, Discount: {Discount}, CreatedAt: {CreatedAt}, LastUpdatedAt: {LastUpdatedAt}";
+        }
+
+        public CategoryUpdateRequest ToCategoryUpdateRequest()
+        {
+            return new CategoryUpdateRequest
+            {
+                CategoryId = CategoryId,
+                CategoryName = CategoryName,
+                Discount = Discount
+            };
+        }
+    }
+
+    public class CategoryUpdateRequest : CategoryAddRequest
+    {
+        [Required(ErrorMessage = "CategoryId is required")]
+        public Guid CategoryId { get; set; }
+    }
+
+    public static class CategoryExtensions
+    {
+        public static CategoryResponse ToCategoryResponse(this Category category)
+        {
+            return new CategoryResponse()
+            {
+                CategoryId = category.CategoryId,
+                CategoryName = category.CategoryName,
+                Discount = category.Discount,
+                CreatedAt = category.CreatedAt,
+                CreatedBy = category.CreatedBy,
+                LastUpdatedAt = category.LastUpdatedAt,
+                LastUpdatedBy = category.LastUpdatedBy
+            };
+        }
+    }
 }
