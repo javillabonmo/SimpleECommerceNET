@@ -3,6 +3,9 @@
 // </copyright>
 // <author> javillabonmo </author>
 
+using System.Globalization;
+using System.Runtime.InteropServices;
+
 using Application.Services;
 using Application.Services.Interfaces;
 
@@ -12,17 +15,21 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// cultura regional (formato de fechas, moneda, etc.)
+var cultureInfo = new CultureInfo("es-CO");
+CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
+CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
+
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
-builder.Services.AddSingleton<IProductService, ProductService>();
-builder.Services.AddSingleton<ICategoryService, CategoryService>();
+builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.AddScoped<ICategoryService, CategoryService>();
 
-builder.Services.AddDbContext<UsersDbContext>(options =>
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
-
 
 var app = builder.Build();
 

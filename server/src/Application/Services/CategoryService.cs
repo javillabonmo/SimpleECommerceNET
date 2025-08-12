@@ -9,25 +9,18 @@ namespace Application.Services
 
     using Domain.Entities.Sales;
 
+    using Infraestructure.Persistence;
+
     public class CategoryService : ICategoryService
 
 
 
     {
-        private readonly List<Category> _categories;
-        public CategoryService(bool initialize = true)
+        private readonly ApplicationDbContext _dbContext;
+
+        public CategoryService(ApplicationDbContext applicationDbContext, bool initialize = false)
         {
-            // Simulando una base de datos en memoria
-            // Aquí podrías inicializar una lista o un contexto de base de datos
-            _categories = new List<Category>();
-            if (initialize)
-            {
-                foreach (Category category in CategoryMock.All())
-                {
-                    // Convertir ProductResponse a Product y agregarlo a la lista
-                    _categories.Add(category);
-                }
-            }
+            _dbContext = applicationDbContext;
         }
         public CategoryResponse AddCategory(CategoryAddRequest? addCategoryRequest)
         {
@@ -40,7 +33,8 @@ namespace Application.Services
 
             category.CategoryId = Guid.NewGuid(); // Asignar un nuevo GUID
 
-            _categories.Add(category);
+            _dbContext.Categories.Add(category);
+            _dbContext.SaveChanges();
 
             // Convertir la entidad de dominio a una respuesta DTO
             return category.ToCategoryResponse();
@@ -57,7 +51,7 @@ namespace Application.Services
             {
                 throw new ArgumentException("Guid cannot be empty.", nameof(guid));
             }
-            return _categories.FirstOrDefault(category => category.CategoryId == guid)?.ToCategoryResponse();
+            return _dbContext.Categories.FirstOrDefault(category => category.CategoryId == guid)?.ToCategoryResponse();
         }
 
         public CategoryResponse? GetCategoryById(int id)
@@ -67,7 +61,7 @@ namespace Application.Services
 
         public IEnumerable<CategoryResponse> GetCategories()
         {
-            return _categories.Select(c => c.ToCategoryResponse());
+            return _dbContext.Categories.Select(c => c.ToCategoryResponse());
         }
 
         public CategoryResponse? UpdateCategory(int id, CategoryAddRequest? updateCategoryRequest)

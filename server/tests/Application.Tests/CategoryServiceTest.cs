@@ -3,9 +3,13 @@
 
 namespace Application.Tests
 {
-    using Application.Services.Interfaces;
-    using Application.Services;
     using Application.DTOs;
+    using Application.Services;
+    using Application.Services.Interfaces;
+
+    using Infraestructure.Persistence;
+
+    using Microsoft.EntityFrameworkCore;
 
     public class CategoryServiceTest
     {
@@ -13,7 +17,7 @@ namespace Application.Tests
 
         public CategoryServiceTest()
         {
-            _categoryService = new CategoryService();
+            _categoryService = new CategoryService(new ApplicationDbContext(new DbContextOptionsBuilder<ApplicationDbContext>().Options));
         }
 
         [Fact]

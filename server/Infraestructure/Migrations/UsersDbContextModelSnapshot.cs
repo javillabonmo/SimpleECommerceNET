@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Infraestructure.Migrations
 {
-    [DbContext(typeof(UsersDbContext))]
+    [DbContext(typeof(ApplicationDbContext))]
     partial class UsersDbContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)
@@ -55,7 +55,7 @@ namespace Infraestructure.Migrations
                     b.HasData(
                         new
                         {
-                            RoleId = new Guid("230e01d2-3f77-4fdc-b8a6-328804001d93"),
+                            RoleId = new Guid("adc7f81e-d8ef-4cab-bbb6-32868d5681f4"),
                             CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             CreatedBy = new Guid("00000000-0000-0000-0000-000000000000"),
                             Description = "Administrator role with full access",
@@ -125,7 +125,7 @@ namespace Infraestructure.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("14b0e6f5-3414-4d10-adfa-ab97981e34ab"),
+                            Id = new Guid("be04f811-123b-420b-938b-04ba64248f0a"),
                             ConfirmPassword = "Admin1234",
                             CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             CreatedBy = new Guid("00000000-0000-0000-0000-000000000000"),
@@ -134,8 +134,76 @@ namespace Infraestructure.Migrations
                             LastUpdatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastUpdatedBy = new Guid("00000000-0000-0000-0000-000000000000"),
                             Password = "Admin1234",
-                            RoleId = new Guid("230e01d2-3f77-4fdc-b8a6-328804001d93")
+                            RoleId = new Guid("adc7f81e-d8ef-4cab-bbb6-32868d5681f4")
                         });
+                });
+
+            modelBuilder.Entity("Domain.Entities.Inventory.Product", b =>
+                {
+                    b.Property<Guid>("ProductId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("CategoryId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("LastUpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("LastUpdatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("decimal(18,4)");
+
+                    b.Property<string>("ProductName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<long>("Stock")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("ProductId");
+
+                    b.HasIndex("CategoryId");
+
+                    b.ToTable("Productos", (string)null);
+                });
+
+            modelBuilder.Entity("Domain.Entities.Sales.Category", b =>
+                {
+                    b.Property<Guid>("CategoryId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("CategoryName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Discount")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("LastUpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("LastUpdatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("CategoryId");
+
+                    b.ToTable("Categorias", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.AuthDB.User", b =>
@@ -147,6 +215,17 @@ namespace Infraestructure.Migrations
                         .IsRequired();
 
                     b.Navigation("Role");
+                });
+
+            modelBuilder.Entity("Domain.Entities.Inventory.Product", b =>
+                {
+                    b.HasOne("Domain.Entities.Sales.Category", "Category")
+                        .WithMany()
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Category");
                 });
 #pragma warning restore 612, 618
         }

@@ -5,11 +5,15 @@
 namespace Application.Tests
 {
     using Application.DTOs;
-    using Application.Services.Interfaces;
-    using Application.Services;
     using Application.DTOs.Enums;
-    using Xunit.Abstractions;
+    using Application.Services;
+    using Application.Services.Interfaces;
 
+    using Infraestructure.Persistence;
+
+    using Microsoft.EntityFrameworkCore;
+
+    using Xunit.Abstractions;
 
     public class ProductServiceTest
     {
@@ -32,7 +36,7 @@ namespace Application.Tests
         private readonly ITestOutputHelper _testOutputHelper;
         public ProductServiceTest(ITestOutputHelper testOutputHelper)
         {
-            _productService = new ProductService(initialize: false);
+            _productService = new ProductService(new ApplicationDbContext(new DbContextOptionsBuilder<ApplicationDbContext>().Options));
             _testOutputHelper = testOutputHelper;
             //mockear el servicio de categorías,products si es necesario
 

@@ -13,28 +13,31 @@ namespace Application.Services
     using Domain.Entities.Sales;
 
     using Mocks;
+    using Infraestructure.Persistence;
 
     public class ProductService : IProductService
     //probando
     {
-        //dbcontext 
-        private readonly List<Product> _products;
-        private readonly ICategoryService _categories;
+        private readonly ApplicationDbContext _context;
+        //private readonly List<Product> _products;
+        // private readonly ICategoryService _categories;
 
-        // Constructor
-        public ProductService(bool initialize = true)
+
+        public ProductService(ApplicationDbContext applicationDbContext, bool initialize = false)
         {
-            // Simulando una base de datos en memoria
-            _products = new List<Product>();
-            _categories = new CategoryService();
+
+            //_products = new List<Product>();
+            // _categories = new CategoryService();
             if (initialize)
             {
                 foreach (Product product in ProductMock.All())
                 {
                     // Convertir ProductResponse a Product y agregarlo a la lista
-                    _products.Add(product);
+                    //_products.Add(product);
                 }
             }
+
+            _context = applicationDbContext;
         }
 
 
@@ -60,7 +63,7 @@ namespace Application.Services
             */
 
             // Validar duplicados antes de agregar
-            if (_products.Any(p => p.ProductName == productAddRequest.ProductName))
+            if (_context.Products.Any(p => p.ProductName == productAddRequest.ProductName))
             {
                 throw new ArgumentException("Product with the same name already exists.", nameof(productAddRequest.ProductName));
             }
@@ -83,8 +86,8 @@ namespace Application.Services
             Product product = productAddRequest.ToProduct();
             product.ProductId = Guid.NewGuid();
 
-            _products.Add(product);
-
+            _context.Add(product);
+            _context.SaveChanges();
             return product.ToProductResponse();
         }
 
@@ -95,12 +98,13 @@ namespace Application.Services
                 throw new ArgumentException("Product ID cannot be empty.", nameof(id));
             }
             // Check if the product exists
-            Product? productToDelete = _products.FirstOrDefault(p => p.ProductId == id);
-            if (productToDelete == null)
+            Product? product = _context.Products.FirstOrDefault(p => p.ProductId == id);
+            if (product == null)
             {
                 return false; // Product not found, nothing to delete
             }
-            _products.Remove(productToDelete);
+            _context.Products.Remove(_context.Products.First(prod => prod.ProductId == id));
+            _context.SaveChanges();
             return true; // Product successfully deleted
         }
 
@@ -139,7 +143,7 @@ namespace Application.Services
                 throw new ArgumentException("Product ID cannot be empty.", nameof(id));
             }
             //si retorno null es por que no es un error que no haya encontrado el producto, por lo tanto no tiene sentido lanzar una excepcion
-            return _products
+            return _context.Products
                 .FirstOrDefault(product => product.ProductId == id)?
                 .ToProductResponse();//operador condicional null (?.) para evitar excepciones si el producto no se encuentra
         }
@@ -147,7 +151,7 @@ namespace Application.Services
         public IEnumerable<ProductResponse> GetProducts()
         {
             //throw new NotImplementedException();
-            return _products.Select(product => product.ToProductResponse());
+            return _context.Products.Select(product => product.ToProductResponse());
         }
 
         public IEnumerable<ProductResponse> GetSortedProducts(IEnumerable<ProductResponse> products, string sortBy, SortOrderEnum sortOrder)
@@ -192,7 +196,7 @@ namespace Application.Services
                 throw new ArgumentException("Product ID cannot be empty.", nameof(productUpdateRequest.ProductId));
             }
             // check if the product exists
-            Product? existingProduct = _products.FirstOrDefault(p => p.ProductId == productUpdateRequest.ProductId);
+            Product? existingProduct = _context.Products.FirstOrDefault(p => p.ProductId == productUpdateRequest.ProductId);
             if (existingProduct == null)
             {
                 throw new KeyNotFoundException($"Product with ID {productUpdateRequest.ProductId} not found.");
@@ -210,7 +214,7 @@ namespace Application.Services
             existingProduct.Stock = productUpdateRequest.Stock >= 0 ? productUpdateRequest.Stock : existingProduct.Stock;
             existingProduct.Category = productUpdateRequest.Category ?? existingProduct.Category;
 
-
+            _context.SaveChanges();
 
 
             return existingProduct.ToProductResponse();
