@@ -6,6 +6,7 @@
 namespace Domain.Entities.Common
 {
     using System.ComponentModel.DataAnnotations;
+    using System.ComponentModel.DataAnnotations.Schema;
 
     using Domain.Entities.AuthDB;
 
@@ -17,6 +18,7 @@ namespace Domain.Entities.Common
         /// <summary>
         /// Gets or sets the Role.
         /// </summary>
+        [ForeignKey("RoleId")]
         public Role Role { get; set; }
 
 

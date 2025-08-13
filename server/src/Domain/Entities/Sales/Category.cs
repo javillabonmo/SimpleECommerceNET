@@ -8,6 +8,7 @@ namespace Domain.Entities.Sales
     using System.ComponentModel.DataAnnotations;
 
     using Domain.Entities.Common;
+    using Domain.Entities.Inventory;
 
     /// <summary>
     /// Defines the <see cref="Category" />
@@ -29,5 +30,10 @@ namespace Domain.Entities.Sales
         /// Gets or sets the Discount
         /// </summary>
         public int Discount { get; set; }
+
+        public int InternalId { get; set; }
+
+        public virtual ICollection<Product>? Products { get; set; }//por cada Id de categoria, una coleccion de productos asociados a la categoria 1:n
+        //public virtual Product? Product { get; set; } //por cada Id de categoria, un producto asociado a la categoria 1:1
     }
 }

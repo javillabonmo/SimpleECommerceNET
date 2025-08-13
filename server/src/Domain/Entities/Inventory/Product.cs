@@ -6,6 +6,7 @@
 namespace Domain.Entities.Inventory
 {
     using System.ComponentModel.DataAnnotations;
+    using System.ComponentModel.DataAnnotations.Schema;
 
     using Domain.Entities.Common;
     using Domain.Entities.Sales;
@@ -21,15 +22,21 @@ namespace Domain.Entities.Inventory
         [Key]
         public Guid ProductId { get; set; }
 
+        public int InternalId { get; set; }
+
         /// <summary>
         /// Gets or sets the ProductName
         /// </summary>
+        [StringLength(100)]
         public string ProductName { get; set; }
 
         /// <summary>
         /// Gets or sets the Category
         /// </summary>
-        public Category? Category { get; set; }
+
+
+        [ForeignKey("CategoryId")]
+        public virtual Category? Category { get; set; }
 
         /// <summary>
         /// Gets or sets the CategoryId

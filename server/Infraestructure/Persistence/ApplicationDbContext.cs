@@ -41,15 +41,18 @@ namespace Infraestructure.Persistence
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+            // FluentAPI
+            modelBuilder.Entity<User>().Property(p => p.IsActive).HasDefaultValue("true");
+            modelBuilder.Entity<User>().ToTable("Usuarios");
 
-            modelBuilder.Entity<User>()
-                .ToTable("Usuarios");
             modelBuilder.Entity<Role>().ToTable("Roles");
             modelBuilder.Entity<Category>()
                 .ToTable("Categorias");
-            modelBuilder.Entity<Product>().Property(p => p.Price).HasColumnType("decimal(18,4)");
+            modelBuilder.Entity<Product>().Property(p => p.Price).HasColumnName("Precio").HasColumnType("decimal(18,4)");
+            modelBuilder.Entity<Product>().Property(p => p.InternalId).ValueGeneratedOnAdd(); // id autoincremental
+            modelBuilder.Entity<Product>().HasIndex(p => p.InternalId).IsUnique(); // indice unico
             modelBuilder.Entity<Product>()
-                .ToTable("Productos");
+                .ToTable("Productos", p => p.HasCheckConstraint("CK_PrecioStock_Positivos", "[Precio] > 0 AND [Stock] > 0"));
 
             // seeds
             var adminRoleId = Guid.Parse("adc7f81e-d8ef-4cab-bbb6-32868d5681f4");
@@ -69,7 +72,7 @@ namespace Infraestructure.Persistence
                 Email = "Admin@Example.com",
                 Password = "Admin1234",
                 ConfirmPassword = "Admin1234",
-                IsActive = true,
+
                 RoleId = adminRoleId,
             }
 

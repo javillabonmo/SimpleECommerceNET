@@ -9,7 +9,7 @@ namespace Domain.Entities.AuthDB
     public class User : AccountEntityBase
     {
         [Key]
-        required public Guid Id { get; set; } = Guid.NewGuid();
+        required public Guid Id { get; set; }
 
         public string? Username { get; set; }
 

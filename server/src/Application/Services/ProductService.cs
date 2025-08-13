@@ -14,6 +14,7 @@ namespace Application.Services
 
     using Mocks;
     using Infraestructure.Persistence;
+    using Microsoft.EntityFrameworkCore;
 
     public class ProductService : IProductService
     //probando
@@ -151,7 +152,9 @@ namespace Application.Services
         public IEnumerable<ProductResponse> GetProducts()
         {
             //throw new NotImplementedException();
-            return _context.Products.Select(product => product.ToProductResponse());
+            return _context.Products.Include("Category")
+                .Select(product => product.ToProductResponse());
+            //return _context.Products.Select(product => product.ToProductResponse());
         }
 
         public IEnumerable<ProductResponse> GetSortedProducts(IEnumerable<ProductResponse> products, string sortBy, SortOrderEnum sortOrder)
