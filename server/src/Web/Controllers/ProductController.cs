@@ -23,7 +23,7 @@ namespace Web.Controllers
         }
 
         [Route("[action]")]
-        public IActionResult Index(string searchBy, string? searchString, string sortBy = nameof(ProductResponse.ProductName), SortOrderEnum sortOrder = SortOrderEnum.Ascending)
+        public async Task<IActionResult> Index(string searchBy, string? searchString, string sortBy = nameof(ProductResponse.ProductName), SortOrderEnum sortOrder = SortOrderEnum.Ascending)
         {
             ViewBag.SearchFields = new Dictionary<string, string>()
         {
@@ -37,7 +37,7 @@ namespace Web.Controllers
             ViewBag.CurrentSearchBy = searchBy;
             ViewBag.CurrentSearchString = searchString;
 
-            IEnumerable<ProductResponse> filteredProducts = _productService.GetFilteredProducts(searchBy, searchString);
+            IEnumerable<ProductResponse> filteredProducts = await _productService.GetFilteredProducts(searchBy, searchString);
             IEnumerable<ProductResponse> sortedProducts = _productService.GetSortedProducts(filteredProducts, sortBy, sortOrder);
             ViewBag.CurrentSortBy = sortBy;
             ViewBag.CurrentSortOrder = sortOrder.ToString();
@@ -52,47 +52,47 @@ namespace Web.Controllers
         }
         [Route("[action]")]
         [HttpGet]
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
-            List<CategoryResponse> categories = _categoryService.GetCategories().ToList();
+            IEnumerable<CategoryResponse> categories = await _categoryService.GetCategories();
             ViewBag.Categories = categories.Select(category => new SelectListItem { Text = category.CategoryName, Value = category.CategoryId.ToString() });
             return View();
         }
         [Route("[action]")]
         [HttpPost]
-        public IActionResult Create(ProductAddRequest productAddRequest)
+        public async Task<IActionResult> Create(ProductAddRequest productAddRequest)
         {
             if (!ModelState.IsValid)
             {
-                List<CategoryResponse> categories = _categoryService.GetCategories().ToList();
+                IEnumerable<CategoryResponse> categories = await _categoryService.GetCategories();
                 ViewBag.Categories = categories.Select(category => new SelectListItem { Text = category.CategoryName, Value = category.CategoryId.ToString() });
                 ViewBag.Errors = ModelState.Values.SelectMany(value => value.Errors).Select(e => e.ErrorMessage).ToList();
                 return View();
             }
-            _productService.AddProduct(productAddRequest);
+            await _productService.AddProduct(productAddRequest);
             return RedirectToAction("Index", "Product");
         }
         [Route("[action]/{id}")]
         [HttpGet]
-        public IActionResult Update(Guid id)
+        public async Task<IActionResult> Update(Guid id)
         {
-            ProductResponse? productResponse = _productService.GetProductById(id);
+            ProductResponse? productResponse = await _productService.GetProductById(id);
             if (productResponse == null)
             {
                 //NotFound();
                 return RedirectToAction("Index", "Product");
             }
             ProductUpdateRequest product = productResponse.ToProductUpdateRequest();
-            List<CategoryResponse> categories = _categoryService.GetCategories().ToList();
+            IEnumerable<CategoryResponse> categories = await _categoryService.GetCategories();
             ViewBag.Categories = categories.Select(category => new SelectListItem { Text = category.CategoryName, Value = category.CategoryId.ToString() });
             return View(product);
         }
 
         [Route("[action]/{id}")]
         [HttpPost]
-        public IActionResult Update(ProductUpdateRequest productUpdateRequest)
+        public async Task<IActionResult> Update(ProductUpdateRequest productUpdateRequest)
         {
-            ProductResponse? productResponse = _productService.GetProductById(productUpdateRequest.ProductId);
+            ProductResponse? productResponse = await _productService.GetProductById(productUpdateRequest.ProductId);
             if (productResponse == null)
             {
                 //NotFound();
@@ -100,13 +100,13 @@ namespace Web.Controllers
             }
             if (ModelState.IsValid)
             {
-                _productService.UpdateProduct(productUpdateRequest);
+                await _productService.UpdateProduct(productUpdateRequest);
                 return RedirectToAction("Index", "Product");
             }
             else
             {
                 ProductUpdateRequest product = productResponse.ToProductUpdateRequest();
-                List<CategoryResponse> categories = _categoryService.GetCategories().ToList();
+                IEnumerable<CategoryResponse> categories = await _categoryService.GetCategories();
                 ViewBag.Categories = categories.Select(category => new SelectListItem { Text = category.CategoryName, Value = category.CategoryId.ToString() });
                 ViewBag.Errors = ModelState.Values.SelectMany(value => value.Errors).Select(e => e.ErrorMessage).ToList();
                 return View(productResponse.ToProductUpdateRequest());
@@ -116,10 +116,10 @@ namespace Web.Controllers
 
         [Route("[action]/{id}")]
         [HttpGet]
-        public IActionResult Delete(Guid id)
+        public async Task<IActionResult> Delete(Guid id)
         {
 
-            ProductResponse? productResponse = _productService.GetProductById(id);
+            ProductResponse? productResponse = await _productService.GetProductById(id);
             if (productResponse == null)
             {
                 return RedirectToAction("Index", "Product");
@@ -129,16 +129,16 @@ namespace Web.Controllers
         }
         [Route("[action]/{id}")]
         [HttpPost]
-        public IActionResult Delete(ProductUpdateRequest productUpdateRequest)
+        public async Task<IActionResult> Delete(ProductUpdateRequest productUpdateRequest)
         {
-            ProductResponse? productResponse = _productService.GetProductById(productUpdateRequest.ProductId);
+            ProductResponse? productResponse = await _productService.GetProductById(productUpdateRequest.ProductId);
             if (productResponse == null)
             {
                 //NotFound();
                 return RedirectToAction("Index", "Product");
             }
 
-            _productService.DeleteProduct(productUpdateRequest.ProductId);
+            await _productService.DeleteProduct(productUpdateRequest.ProductId);
             return RedirectToAction("Index", "Product");
 
         }

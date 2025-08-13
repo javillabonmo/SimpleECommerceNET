@@ -16,23 +16,23 @@ namespace Application.Services.Interfaces
  */
     public interface IProductService
     {
-        ProductResponse AddProduct(ProductAddRequest? productAddRequest);
+        Task<ProductResponse> AddProduct(ProductAddRequest? productAddRequest);
 
         // en lugar de usar null o false manejar excepciones para los casos de error
 
 
-        ProductResponse? GetProductById(int id);
+        Task<ProductResponse?> GetProductById(int id);
 
-        ProductResponse? GetProductById(Guid id);
+        Task<ProductResponse?> GetProductById(Guid id);
 
-        IEnumerable<ProductResponse> GetProducts();
+        Task<IEnumerable<ProductResponse>> GetProducts();
 
-        ProductResponse? UpdateProduct(ProductUpdateRequest? productUpdateRequest); // return ProductDto con el objeto actualizado o null si no existe
+        Task<ProductResponse?> UpdateProduct(ProductUpdateRequest? productUpdateRequest); // return ProductDto con el objeto actualizado o null si no existe
 
-        bool DeleteProduct(Guid id); // return true si se elimino, false si no existe
+        Task<bool> DeleteProduct(Guid id); // return true si se elimino, false si no existe
 
         // bool DeleteProduct(int id,Guid userId);//informacion del usuario que elimina el producto, puede ser un token de autenticacion 
-        IEnumerable<ProductResponse> GetFilteredProducts(string searchBy, string? searchString);
+        Task<IEnumerable<ProductResponse>> GetFilteredProducts(string searchBy, string? searchString);
 
         // IEnumerable<ProductResponse> GetFilteredProducts(string? searchBy, string? searchString, int pageNumber, int pageSize);
 

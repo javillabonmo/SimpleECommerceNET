@@ -22,15 +22,15 @@ namespace Application.Tests
 
         [Fact]
         //1. 
-        public void CategoryService_AddCategory_ShouldReturnCategoryResponse()
+        public async Task CategoryService_AddCategory_ShouldReturnCategoryResponse()
         {
             // Arrange
 
             CategoryAddRequest requestCategory = new CategoryAddRequest { CategoryName = "Electronics" };
 
             // Act
-            CategoryResponse category = _categoryService.AddCategory(requestCategory);
-            IEnumerable<CategoryResponse> categories = _categoryService.GetCategories();
+            CategoryResponse category = await _categoryService.AddCategory(requestCategory);
+            IEnumerable<CategoryResponse> categories = await _categoryService.GetCategories();
             // Assert
             Assert.NotNull(category);
             Assert.True(category.CategoryId != Guid.Empty, "Category ID should not be empty.");

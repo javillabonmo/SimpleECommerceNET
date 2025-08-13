@@ -11,10 +11,9 @@ namespace Application.Services
 
     using Infraestructure.Persistence;
 
+    using Microsoft.EntityFrameworkCore;
+
     public class CategoryService : ICategoryService
-
-
-
     {
         private readonly ApplicationDbContext _dbContext;
 
@@ -22,7 +21,8 @@ namespace Application.Services
         {
             _dbContext = applicationDbContext;
         }
-        public CategoryResponse AddCategory(CategoryAddRequest? addCategoryRequest)
+
+        public async Task<CategoryResponse> AddCategory(CategoryAddRequest? addCategoryRequest)
         {
             if (addCategoryRequest == null)
             {
@@ -34,37 +34,40 @@ namespace Application.Services
             category.CategoryId = Guid.NewGuid(); // Asignar un nuevo GUID
 
             _dbContext.Categories.Add(category);
-            _dbContext.SaveChanges();
+            await _dbContext.SaveChangesAsync();
 
             // Convertir la entidad de dominio a una respuesta DTO
             return category.ToCategoryResponse();
         }
 
-        public bool DeleteCategory(int id)
+        public async Task<bool> DeleteCategory(int id)
         {
             throw new NotImplementedException();
         }
 
-        public CategoryResponse? GetCategoryByGuid(Guid guid)
+        public async Task<CategoryResponse?> GetCategoryByGuid(Guid guid)
         {
             if (guid == Guid.Empty)
             {
                 throw new ArgumentException("Guid cannot be empty.", nameof(guid));
             }
-            return _dbContext.Categories.FirstOrDefault(category => category.CategoryId == guid)?.ToCategoryResponse();
+            Category? category = await _dbContext.Categories.FirstOrDefaultAsync(c => c.CategoryId == guid);
+
+            return category?.ToCategoryResponse();
         }
 
-        public CategoryResponse? GetCategoryById(int id)
+        public async Task<CategoryResponse?> GetCategoryById(int id)
         {
             throw new NotImplementedException();
         }
 
-        public IEnumerable<CategoryResponse> GetCategories()
+        public async Task<IEnumerable<CategoryResponse>> GetCategories()
         {
-            return _dbContext.Categories.Select(c => c.ToCategoryResponse());
+            List<Category> categories = await _dbContext.Categories.ToListAsync();
+            return categories.Select(c => c.ToCategoryResponse());
         }
 
-        public CategoryResponse? UpdateCategory(int id, CategoryAddRequest? updateCategoryRequest)
+        public async Task<CategoryResponse?> UpdateCategory(int id, CategoryAddRequest? updateCategoryRequest)
         {
             throw new NotImplementedException();
         }

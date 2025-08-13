@@ -9,6 +9,8 @@ namespace Application.Tests
     using Application.Services;
     using Application.Services.Interfaces;
 
+    using Domain.Entities.Inventory;
+
     using Infraestructure.Persistence;
 
     using Microsoft.EntityFrameworkCore;
@@ -50,16 +52,16 @@ namespace Application.Tests
 
         //2. si ProductAddRequest es nulo, debe lanzar una excepción
         [Fact]
-        public void AddProduct_NullRequest_ThrowsArgumentNullException()
+        public async Task AddProduct_NullRequest_ThrowsArgumentNullException()
         {
             // Arrange
             ProductAddRequest? productAddRequest = null;
             // Act & Assert
-            Assert.Throws<ArgumentNullException>(() => _productService.AddProduct(productAddRequest));
+            await Assert.ThrowsAsync<ArgumentNullException>(async () => { await _productService.AddProduct(productAddRequest)});
         }
         //3. si ProductName es nulo o vacío, debe lanzar una excepción
         [Fact]
-        public void AddProduct_NullOrEmptyName_ThrowsArgumentException()
+        public async Task AddProduct_NullOrEmptyName_ThrowsArgumentException()
         {
             // Arrange
             ProductAddRequest productAddRequest = new ProductAddRequest
@@ -69,11 +71,11 @@ namespace Application.Tests
 
             };
             // Act & Assert
-            Assert.Throws<ArgumentException>(() => _productService.AddProduct(productAddRequest));
+            await Assert.ThrowsAsync<ArgumentException>(async () => await _productService.AddProduct(productAddRequest));
         }
         //4. si Price es menor o igual a cero, debe lanzar una excepción
         [Fact]
-        public void AddProduct_NegativeOrZeroPrice_ThrowsArgumentException()
+        public async Task AddProduct_NegativeOrZeroPrice_ThrowsArgumentException()
         {
             // Arrange
             ProductAddRequest productAddRequest = new ProductAddRequest
@@ -82,11 +84,11 @@ namespace Application.Tests
                 Price = 0.0m, // or negative value
             };
             // Act & Assert
-            Assert.Throws<ArgumentException>(() => _productService.AddProduct(productAddRequest));
+            await Assert.ThrowsAsync<ArgumentException>(async () => await _productService.AddProduct(productAddRequest));
         }
         //5. si ProductName esta duplicado, debe lanzar una excepción
         [Fact]
-        public void AddProduct_DuplicateName_ArgumentExceptionn()
+        public async Task AddProduct_DuplicateName_ArgumentExceptionn()
         {
             // Arrange
             ProductAddRequest productAddRequest1 = new ProductAddRequest
@@ -103,11 +105,11 @@ namespace Application.Tests
                 CategoryId = Guid.NewGuid(), // Assuming CategoryId is required
             };
             // Act & Assert
-            Assert.Throws<ArgumentException>(() => _productService.AddProduct(productAddRequest2));
+            await Assert.ThrowsAsync<ArgumentException>(async () => await _productService.AddProduct(productAddRequest2));
         }
         //6. si el producto se guarda bien, su ProductId no debe ser Guid.Empty
         [Fact]
-        public void AddProduct_ValidRequest_ProductIdIsNotEmpty()
+        public async Task AddProduct_ValidRequest_ProductIdIsNotEmpty()
         {
             // Arrange
             ProductAddRequest productAddRequest = new ProductAddRequest
@@ -117,7 +119,7 @@ namespace Application.Tests
                 CategoryId = Guid.NewGuid(), // Assuming CategoryId is required
             };
             // Act
-            ProductResponse response = _productService.AddProduct(productAddRequest);
+            ProductResponse response = await _productService.AddProduct(productAddRequest);
             // Assert
             Assert.NotEqual(Guid.Empty, response.ProductId);
         }
@@ -127,15 +129,15 @@ namespace Application.Tests
 
         [Fact]
         //1. si el ProductId es Guid.Empty, debe lanzar una excepción
-        public void GetProductById_EmptyGuid_ThrowsArgumentException()
+        public async Task GetProductById_EmptyGuid_ThrowsArgumentException()
         {
             // Arrange
             Guid id = Guid.Empty;
             // Act & Assert
-            Assert.Throws<ArgumentException>(() => _productService.GetProductById(id));
+            await Assert.ThrowsAsync<ArgumentException>(async () => await _productService.GetProductById(id));
         }
         [Fact]
-        public void GetProductById_ValidId_ReturnsProductResponse()
+        public async Task GetProductById_ValidId_ReturnsProductResponse()
         {
             // Arrange
             ProductAddRequest productAddRequest = new ProductAddRequest
@@ -144,10 +146,10 @@ namespace Application.Tests
                 Price = 10.0m,
                 CategoryId = Guid.NewGuid(), // Assuming CategoryId is required
             };
-            ProductResponse addedProduct = _productService.AddProduct(productAddRequest);
+            ProductResponse addedProduct = await _productService.AddProduct(productAddRequest);
 
             // Act
-            ProductResponse? response = _productService.GetProductById(addedProduct.ProductId);
+            ProductResponse? response = await _productService.GetProductById(addedProduct.ProductId);
 
             // Assert
             Assert.NotNull(response);
@@ -158,9 +160,9 @@ namespace Application.Tests
         #region GetProducts
         [Fact]
         //1. la lista de productos debe estar vacia por defecto, antes de añadir cualquier producto
-        public void GetProducts_EmptyCollection_()
+        public async Task GetProducts_EmptyCollection_()
         {
-            IEnumerable<ProductResponse> productResponse = _productService.GetProducts();
+            IEnumerable<ProductResponse> productResponse = await _productService.GetProducts();
 
             Assert.Empty(productResponse);
         }
@@ -170,7 +172,7 @@ namespace Application.Tests
         #region UpdateProduct
         #endregion
         [Fact]
-        public void UpdateProduct_ValidRequest_ProductUpdated()
+        public async Task UpdateProduct_ValidRequest_ProductUpdated()
         {
             // Arrange
             ProductAddRequest productAddRequest = new ProductAddRequest
@@ -179,11 +181,11 @@ namespace Application.Tests
                 Price = 10.0m,
                 CategoryId = Guid.NewGuid(), // Assuming CategoryId is required
             };
-            ProductResponse addedProduct = _productService.AddProduct(productAddRequest);
+            ProductResponse addedProduct = await _productService.AddProduct(productAddRequest);
 
             // Act
             addedProduct.ProductName = "Updated Product";
-            ProductResponse? updatedProduct = _productService.UpdateProduct(addedProduct.ToProductUpdateRequest());
+            ProductResponse? updatedProduct = await _productService.UpdateProduct(addedProduct.ToProductUpdateRequest());
             // Assert
             Assert.NotNull(updatedProduct);
             Assert.Equal("Updated Product", updatedProduct.ProductName);
@@ -201,7 +203,7 @@ namespace Application.Tests
         }
 
         [Fact]
-        public void UpdateProduct_IdNull_ThrowsArgumentException()
+        public async Task UpdateProduct_IdNull_ThrowsArgumentException()
         {
             // Arrange
             ProductAddRequest productAddRequest = new ProductAddRequest
@@ -211,16 +213,16 @@ namespace Application.Tests
                 CategoryId = Guid.NewGuid(), // Assuming CategoryId is required
 
             };
-            ProductResponse addedProduct = _productService.AddProduct(productAddRequest);
+            ProductResponse addedProduct = await _productService.AddProduct(productAddRequest);
 
             // Act & Assert
             addedProduct.ProductId = Guid.Empty; // Set to an empty ID
-            Assert.Throws<ArgumentException>(() => _productService.UpdateProduct(addedProduct.ToProductUpdateRequest()));
+            await Assert.ThrowsAsync<ArgumentException>(async () => await _productService.UpdateProduct(addedProduct.ToProductUpdateRequest()));
         }
         //3. si el producto a actualizar es igual al que se está actualizando, no debe lanzar una excepción, debe retornar el mismo objeto
         //4. el id del producto actualizado debeía ser el mismo que el del producto original
         [Fact]
-        public void UpdateProduct_SameProduct_ReturnsSameProduct()
+        public async Task UpdateProduct_SameProduct_ReturnsSameProduct()
         {
             // Arrange
             ProductAddRequest productAddRequest = new ProductAddRequest
@@ -229,10 +231,10 @@ namespace Application.Tests
                 Price = 10.0m,
                 CategoryId = Guid.NewGuid(), // Assuming CategoryId is required
             };
-            ProductResponse addedProduct = _productService.AddProduct(productAddRequest);
+            ProductResponse addedProduct = await _productService.AddProduct(productAddRequest);
 
             // Act
-            ProductResponse? updatedProduct = _productService.UpdateProduct(addedProduct.ToProductUpdateRequest());
+            ProductResponse? updatedProduct = await _productService.UpdateProduct(addedProduct.ToProductUpdateRequest());
 
             // Assert
             Assert.NotNull(updatedProduct);
@@ -242,7 +244,7 @@ namespace Application.Tests
         #endregion
 
         [Fact]
-        public void DeleteProduct_ValidId_ProductDeleted()
+        public async Task DeleteProduct_ValidId_ProductDeleted()
         {
             // Arrange
             ProductAddRequest productAddRequest = new ProductAddRequest
@@ -251,18 +253,21 @@ namespace Application.Tests
                 Price = 10.0m,
                 CategoryId = Guid.NewGuid(), // Assuming CategoryId is required
             };
-            ProductResponse addedProduct = _productService.AddProduct(productAddRequest);
+            ProductResponse addedProduct = await _productService.AddProduct(productAddRequest);
 
             // Act
-            bool isDeleted = _productService.DeleteProduct(addedProduct.ProductId);
+            bool isDeleted = await _productService.DeleteProduct(addedProduct.ProductId);
 
             // Assert
 
             // With this corrected line:
-            _productService.GetProducts().Where(product => product.ProductId == addedProduct.ProductId);
+            IEnumerable<ProductResponse> products = await _productService.GetProducts();
+
+            products.Where(product => product.ProductId == addedProduct.ProductId);
+
             Assert.True(isDeleted);
 
-            if (_productService.GetProducts().FirstOrDefault(id => id.Equals(addedProduct.ProductId)) == null)
+            if (products.FirstOrDefault(id => id.Equals(addedProduct.ProductId)) == null)
             {
                 _testOutputHelper.WriteLine("Product deleted successfully.");
             }
@@ -271,13 +276,13 @@ namespace Application.Tests
                 _testOutputHelper.WriteLine("Product deletion failed.");
             }
 
-            Assert.Null(_productService.GetProductById(addedProduct.ProductId));
+            Assert.Null(await _productService.GetProductById(addedProduct.ProductId));
         }
 
         #region GetFilteredProducts
 
         [Fact]
-        public void GetProducts_ValidCollection_ProductsFiltered()
+        public async Task GetProducts_ValidCollection_ProductsFiltered()
         {
 
 
@@ -288,9 +293,9 @@ namespace Application.Tests
                 Price = 10.0m,
                 CategoryId = Guid.NewGuid(), // Assuming CategoryId is required
             };
-            List<ProductResponse> addedProduct = [_productService.AddProduct(productAddRequest)];
-            var products = _productService.GetFilteredProducts(nameof(productAddRequest.ProductName), "");
-            var productResponse2 = _productService.GetProducts();
+            ProductResponse addedProduct = await _productService.AddProduct(productAddRequest);
+            var products = await _productService.GetFilteredProducts(nameof(productAddRequest.ProductName), "");
+            var productResponse2 = await _productService.GetProducts();
 
 
             foreach (ProductResponse product in products)
@@ -299,7 +304,7 @@ namespace Application.Tests
                 {
                     if (product.ProductName.Contains("te", StringComparison.OrdinalIgnoreCase))
                     {
-                        Assert.Contains(product, addedProduct);
+                        Assert.Contains(addedProduct, products);
                     }
                 }
             }
@@ -309,7 +314,7 @@ namespace Application.Tests
         #region GetSortedProducts
 
         [Fact]
-        public void GetSortedProducts_ValidCollection_ProductsSorted()
+        public async Task GetSortedProducts_ValidCollection_ProductsSorted()
         {
             // Arrange
             ProductAddRequest productAddRequest1 = new ProductAddRequest
@@ -324,10 +329,10 @@ namespace Application.Tests
                 Price = 15.0m,
                 CategoryId = Guid.NewGuid(), // Assuming CategoryId is required
             };
-            _productService.AddProduct(productAddRequest1);
-            _productService.AddProduct(productAddRequest2);
+            await _productService.AddProduct(productAddRequest1);
+            await _productService.AddProduct(productAddRequest2);
 
-            var productsFromService = _productService.GetProducts();
+            var productsFromService = await _productService.GetProducts();
             foreach (ProductResponse product in productsFromService)
             {
                 _testOutputHelper.WriteLine(product.ToString());

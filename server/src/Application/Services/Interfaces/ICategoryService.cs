@@ -4,16 +4,20 @@ namespace Application.Services.Interfaces
 {
 
     using Application.DTOs;
+
     public interface ICategoryService
     {
-        CategoryResponse AddCategory(CategoryAddRequest? addCategoryRequest);
+        Task<CategoryResponse> AddCategory(CategoryAddRequest? addCategoryRequest);
 
-        CategoryResponse? GetCategoryById(int id);
+        Task<CategoryResponse?> GetCategoryById(int id);
 
-        CategoryResponse? GetCategoryByGuid(Guid guid);
-        IEnumerable<CategoryResponse> GetCategories();
-        CategoryResponse? UpdateCategory(int id, CategoryAddRequest? updateCategoryRequest);
-        bool DeleteCategory(int id);
+        Task<CategoryResponse?> GetCategoryByGuid(Guid guid);
+
+        Task<IEnumerable<CategoryResponse>> GetCategories();
+
+        Task<CategoryResponse?> UpdateCategory(int id, CategoryAddRequest? updateCategoryRequest);
+
+        Task<bool> DeleteCategory(int id);
     }
 
 }
