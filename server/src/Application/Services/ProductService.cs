@@ -15,16 +15,17 @@ namespace Application.Services
     using Mocks;
     using Infraestructure.Persistence;
     using Microsoft.EntityFrameworkCore;
+    using Infraestructure.Interfaces;
 
     public class ProductService : IProductService
     //probando
     {
-        private readonly ApplicationDbContext _context;
+        private readonly IProductRepository _productRepository;
         //private readonly List<Product> _products;
         // private readonly ICategoryService _categories;
 
 
-        public ProductService(ApplicationDbContext applicationDbContext, bool initialize = false)
+        public ProductService(IProductRepository productRepository, bool initialize = false)
         {
 
             //_products = new List<Product>();
@@ -38,7 +39,7 @@ namespace Application.Services
                 }
             }
 
-            _context = applicationDbContext;
+            _productRepository = productRepository;
         }
 
 
@@ -64,7 +65,7 @@ namespace Application.Services
             */
 
             // Validar duplicados antes de agregar
-            if (_context.Products.Any(p => p.ProductName == productAddRequest.ProductName))
+            if (await _productRepository.GetProductByName(productAddRequest.ProductName) is not null)
             {
                 throw new ArgumentException("Product with the same name already exists.", nameof(productAddRequest.ProductName));
             }
@@ -87,8 +88,7 @@ namespace Application.Services
             Product product = productAddRequest.ToProduct();
             product.ProductId = Guid.NewGuid();
 
-            _context.Add(product);
-            await _context.SaveChangesAsync();
+            await _productRepository.AddProduct(product);
             return product.ToProductResponse();
         }
 
@@ -99,13 +99,12 @@ namespace Application.Services
                 throw new ArgumentException("Product ID cannot be empty.", nameof(id));
             }
             // Check if the product exists
-            Product? product = await _context.Products.FirstOrDefaultAsync(p => p.ProductId == id);
+            Product? product = await _productRepository.GetProductById(id);
             if (product == null)
             {
                 return false; // Product not found, nothing to delete
             }
-            _context.Products.Remove(_context.Products.First(prod => prod.ProductId == id));
-            await _context.SaveChangesAsync();
+            await _productRepository.DeleteProduct(id);
             return true; // Product successfully deleted
         }
 
@@ -144,15 +143,14 @@ namespace Application.Services
                 throw new ArgumentException("Product ID cannot be empty.", nameof(id));
             }
             //si retorno null es por que no es un error que no haya encontrado el producto, por lo tanto no tiene sentido lanzar una excepcion
-            Product? product = await _context.Products
-                .FirstOrDefaultAsync(product => product.ProductId == id);
+            Product? product = await _productRepository.GetProductById(id);
 
             return product?.ToProductResponse();//operador condicional null (?.) para evitar excepciones si el producto no se encuentra
         }
 
         public async Task<IEnumerable<ProductResponse>> GetProducts()
         {
-            List<Product> products = await _context.Products.Include("Category").ToListAsync();
+            List<Product> products = await _productRepository.GetProducts();
             return products.Select(p => p.ToProductResponse());
         }
 
@@ -198,7 +196,7 @@ namespace Application.Services
                 throw new ArgumentException("Product ID cannot be empty.", nameof(productUpdateRequest.ProductId));
             }
             // check if the product exists
-            Product? existingProduct = await _context.Products.FirstOrDefaultAsync(p => p.ProductId == productUpdateRequest.ProductId);
+            Product? existingProduct = await _productRepository.GetProductById(productUpdateRequest.ProductId);
             if (existingProduct == null)
             {
                 throw new KeyNotFoundException($"Product with ID {productUpdateRequest.ProductId} not found.");
@@ -216,7 +214,7 @@ namespace Application.Services
             existingProduct.Stock = productUpdateRequest.Stock >= 0 ? productUpdateRequest.Stock : existingProduct.Stock;
             existingProduct.Category = productUpdateRequest.Category ?? existingProduct.Category;
 
-            await _context.SaveChangesAsync();
+            await _productRepository.UpdateProduct(existingProduct);
 
 
             return existingProduct.ToProductResponse();

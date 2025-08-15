@@ -11,6 +11,8 @@ namespace Application.Tests
 
     using Domain.Entities.Inventory;
 
+    using FluentAssertions;
+
     using Infraestructure.Persistence;
 
     using Microsoft.EntityFrameworkCore;
@@ -50,16 +52,22 @@ namespace Application.Tests
         //cada requerimiento es una funcion de test
         //MétodoAEvaluar_CondiciónEsperada_ResultadoEsperado
 
-        //2. si ProductAddRequest es nulo, debe lanzar una excepción
+        // 2. si ProductAddRequest es nulo, debe lanzar una excepción
         [Fact]
         public async Task AddProduct_NullRequest_ThrowsArgumentNullException()
         {
             // Arrange
             ProductAddRequest? productAddRequest = null;
-            // Act & Assert
-            await Assert.ThrowsAsync<ArgumentNullException>(async () => { await _productService.AddProduct(productAddRequest)});
+
+            // Act-ion
+            Func<Task> act = async () => await _productService.AddProduct(productAddRequest);
+
+            // Assert
+            await act.Should().ThrowAsync<ArgumentNullException>()
+                .WithMessage("Value cannot be null. (Parameter 'productAddRequest')");
         }
-        //3. si ProductName es nulo o vacío, debe lanzar una excepción
+
+        // 3. si ProductName es nulo o vacío, debe lanzar una excepción
         [Fact]
         public async Task AddProduct_NullOrEmptyName_ThrowsArgumentException()
         {
@@ -70,8 +78,12 @@ namespace Application.Tests
                 Price = 10.0m,
 
             };
-            // Act & Assert
-            await Assert.ThrowsAsync<ArgumentException>(async () => await _productService.AddProduct(productAddRequest));
+            // Act
+            Func<Task> act = async () => await _productService.AddProduct(productAddRequest);
+
+            // Assert
+            await act.Should().ThrowAsync<ArgumentException>()
+                .WithMessage("Product name cannot be null or empty. (Parameter 'ProductName')");
         }
         //4. si Price es menor o igual a cero, debe lanzar una excepción
         [Fact]
