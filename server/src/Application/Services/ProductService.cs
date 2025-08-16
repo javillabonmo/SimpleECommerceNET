@@ -10,11 +10,7 @@ namespace Application.Services
     using Application.Services.Interfaces;
 
     using Domain.Entities.Inventory;
-    using Domain.Entities.Sales;
 
-    using Mocks;
-    using Infraestructure.Persistence;
-    using Microsoft.EntityFrameworkCore;
     using Infraestructure.Interfaces;
 
     public class ProductService : IProductService
@@ -25,20 +21,8 @@ namespace Application.Services
         // private readonly ICategoryService _categories;
 
 
-        public ProductService(IProductRepository productRepository, bool initialize = false)
+        public ProductService(IProductRepository productRepository)
         {
-
-            //_products = new List<Product>();
-            // _categories = new CategoryService();
-            if (initialize)
-            {
-                foreach (Product product in ProductMock.All())
-                {
-                    // Convertir ProductResponse a Product y agregarlo a la lista
-                    //_products.Add(product);
-                }
-            }
-
             _productRepository = productRepository;
         }
 

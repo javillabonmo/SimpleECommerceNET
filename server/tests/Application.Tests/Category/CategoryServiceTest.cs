@@ -1,7 +1,4 @@
-﻿
-
-
-namespace Application.Tests
+﻿namespace Application.Tests.Category
 {
     using Application.DTOs;
     using Application.Services;

@@ -1,21 +1,22 @@
-﻿
-
-
-
-namespace Application.Tests
+﻿namespace Application.Tests.Product
 {
     using Application.DTOs;
     using Application.DTOs.Enums;
     using Application.Services;
     using Application.Services.Interfaces;
 
+    using AutoFixture;
+
     using Domain.Entities.Inventory;
 
     using FluentAssertions;
 
+    using Infraestructure.Interfaces;
     using Infraestructure.Persistence;
 
     using Microsoft.EntityFrameworkCore;
+
+    using Moq;
 
     using Xunit.Abstractions;
 
@@ -32,17 +33,27 @@ namespace Application.Tests
          * El objetivo es: validar que el servicio se comporte como debe bajo distintos escenarios
          * los test deben fallar si la lógica de negocio falla
          *
+         *por test unitario se prueba una sola funcionalidad, un solo metodo del servicio, de un metodo se puede esperar tener
+         *varias pruebas unitarias, cada una probando un caso diferente siendo este caso una funcionalidad/requerimiento del servicio
+         *
          * las validaciones van en el servicio y se comprueban en los test
          */
 
         private readonly IProductService _productService;
 
         private readonly ITestOutputHelper _testOutputHelper;
+
+        private readonly IFixture _fixture;
+
+        private readonly Mock<IProductRepository> _productRepositoryMock;
+
+
         public ProductServiceTest(ITestOutputHelper testOutputHelper)
         {
-            _productService = new ProductService(new ApplicationDbContext(new DbContextOptionsBuilder<ApplicationDbContext>().Options));
+            _productService = new ProductService(_productRepositoryMock.Object);
             _testOutputHelper = testOutputHelper;
-            //mockear el servicio de categorías,products si es necesario
+            _fixture = new Fixture();
+            _productRepositoryMock = new Mock<IProductRepository>();
 
         }
 
@@ -58,6 +69,10 @@ namespace Application.Tests
         {
             // Arrange
             ProductAddRequest? productAddRequest = null;
+            Product product = productAddRequest.ToProduct();
+            // Mock
+            _productRepositoryMock.Setup(repo => repo.AddProduct(It.IsAny<Product>())).ReturnsAsync(product);
+
 
             // Act-ion
             Func<Task> act = async () => await _productService.AddProduct(productAddRequest);
@@ -72,12 +87,7 @@ namespace Application.Tests
         public async Task AddProduct_NullOrEmptyName_ThrowsArgumentException()
         {
             // Arrange
-            ProductAddRequest productAddRequest = new ProductAddRequest
-            {
-                ProductName = null, // or string.Empty
-                Price = 10.0m,
-
-            };
+            ProductAddRequest productAddRequest = _fixture.Build<ProductAddRequest>().With(p => p.ProductName == null).Create();
             // Act
             Func<Task> act = async () => await _productService.AddProduct(productAddRequest);
 
@@ -90,11 +100,7 @@ namespace Application.Tests
         public async Task AddProduct_NegativeOrZeroPrice_ThrowsArgumentException()
         {
             // Arrange
-            ProductAddRequest productAddRequest = new ProductAddRequest
-            {
-                ProductName = "Test Product",
-                Price = 0.0m, // or negative value
-            };
+            ProductAddRequest productAddRequest = _fixture.Build<ProductAddRequest>().With(p => p.ProductName == null).With(p => p.Price == 0.0m).Create();
             // Act & Assert
             await Assert.ThrowsAsync<ArgumentException>(async () => await _productService.AddProduct(productAddRequest));
         }
@@ -103,19 +109,9 @@ namespace Application.Tests
         public async Task AddProduct_DuplicateName_ArgumentExceptionn()
         {
             // Arrange
-            ProductAddRequest productAddRequest1 = new ProductAddRequest
-            {
-                ProductName = "Test Product",
-                Price = 10.0m,
-                CategoryId = Guid.NewGuid(), // Assuming CategoryId is required
-            };
-            _productService.AddProduct(productAddRequest1); // Add first product
-            ProductAddRequest productAddRequest2 = new ProductAddRequest
-            {
-                ProductName = "Test Product", // Duplicate name
-                Price = 15.0m,
-                CategoryId = Guid.NewGuid(), // Assuming CategoryId is required
-            };
+            ProductAddRequest productAddRequest1 = _fixture.Build<ProductAddRequest>().With(p => p.Price == 10.0m).Create();
+            await _productService.AddProduct(productAddRequest1); // Add first product
+            ProductAddRequest productAddRequest2 = _fixture.Build<ProductAddRequest>().With(p => p.Price == 15.0m).Create();
             // Act & Assert
             await Assert.ThrowsAsync<ArgumentException>(async () => await _productService.AddProduct(productAddRequest2));
         }
@@ -124,12 +120,7 @@ namespace Application.Tests
         public async Task AddProduct_ValidRequest_ProductIdIsNotEmpty()
         {
             // Arrange
-            ProductAddRequest productAddRequest = new ProductAddRequest
-            {
-                ProductName = "Valid Product",
-                Price = 20.0m,
-                CategoryId = Guid.NewGuid(), // Assuming CategoryId is required
-            };
+            ProductAddRequest productAddRequest = _fixture.Build<ProductAddRequest>().With(p => p.Price == 10.0m).Create();
             // Act
             ProductResponse response = await _productService.AddProduct(productAddRequest);
             // Assert
@@ -152,12 +143,7 @@ namespace Application.Tests
         public async Task GetProductById_ValidId_ReturnsProductResponse()
         {
             // Arrange
-            ProductAddRequest productAddRequest = new ProductAddRequest
-            {
-                ProductName = "Test Product",
-                Price = 10.0m,
-                CategoryId = Guid.NewGuid(), // Assuming CategoryId is required
-            };
+            ProductAddRequest productAddRequest = _fixture.Build<ProductAddRequest>().With(p => p.Price == 10.0m).Create();
             ProductResponse addedProduct = await _productService.AddProduct(productAddRequest);
 
             // Act
@@ -187,12 +173,7 @@ namespace Application.Tests
         public async Task UpdateProduct_ValidRequest_ProductUpdated()
         {
             // Arrange
-            ProductAddRequest productAddRequest = new ProductAddRequest
-            {
-                ProductName = "Test Product",
-                Price = 10.0m,
-                CategoryId = Guid.NewGuid(), // Assuming CategoryId is required
-            };
+            ProductAddRequest productAddRequest = _fixture.Build<ProductAddRequest>().With(p => p.Price == 10.0m).Create();
             ProductResponse addedProduct = await _productService.AddProduct(productAddRequest);
 
             // Act
@@ -218,13 +199,7 @@ namespace Application.Tests
         public async Task UpdateProduct_IdNull_ThrowsArgumentException()
         {
             // Arrange
-            ProductAddRequest productAddRequest = new ProductAddRequest
-            {
-                ProductName = "Test Product",
-                Price = 10.0m,
-                CategoryId = Guid.NewGuid(), // Assuming CategoryId is required
-
-            };
+            ProductAddRequest productAddRequest = _fixture.Build<ProductAddRequest>().With(p => p.Price == 10.0m).Create();
             ProductResponse addedProduct = await _productService.AddProduct(productAddRequest);
 
             // Act & Assert
@@ -237,12 +212,7 @@ namespace Application.Tests
         public async Task UpdateProduct_SameProduct_ReturnsSameProduct()
         {
             // Arrange
-            ProductAddRequest productAddRequest = new ProductAddRequest
-            {
-                ProductName = "Test Product",
-                Price = 10.0m,
-                CategoryId = Guid.NewGuid(), // Assuming CategoryId is required
-            };
+            ProductAddRequest productAddRequest = _fixture.Build<ProductAddRequest>().With(p => p.Price == 10.0m).Create();
             ProductResponse addedProduct = await _productService.AddProduct(productAddRequest);
 
             // Act
@@ -259,12 +229,7 @@ namespace Application.Tests
         public async Task DeleteProduct_ValidId_ProductDeleted()
         {
             // Arrange
-            ProductAddRequest productAddRequest = new ProductAddRequest
-            {
-                ProductName = "Test Product",
-                Price = 10.0m,
-                CategoryId = Guid.NewGuid(), // Assuming CategoryId is required
-            };
+            ProductAddRequest productAddRequest = _fixture.Build<ProductAddRequest>().With(p => p.Price == 10.0m).Create();
             ProductResponse addedProduct = await _productService.AddProduct(productAddRequest);
 
             // Act
@@ -299,12 +264,7 @@ namespace Application.Tests
 
 
             //arrange
-            ProductAddRequest productAddRequest = new ProductAddRequest
-            {
-                ProductName = "Test Product",
-                Price = 10.0m,
-                CategoryId = Guid.NewGuid(), // Assuming CategoryId is required
-            };
+            ProductAddRequest productAddRequest = _fixture.Build<ProductAddRequest>().With(p => p.Price == 10.0m).Create();
             ProductResponse addedProduct = await _productService.AddProduct(productAddRequest);
             var products = await _productService.GetFilteredProducts(nameof(productAddRequest.ProductName), "");
             var productResponse2 = await _productService.GetProducts();
@@ -329,18 +289,8 @@ namespace Application.Tests
         public async Task GetSortedProducts_ValidCollection_ProductsSorted()
         {
             // Arrange
-            ProductAddRequest productAddRequest1 = new ProductAddRequest
-            {
-                ProductName = "Apple",
-                Price = 10.0m,
-                CategoryId = Guid.NewGuid(), // Assuming CategoryId is required
-            };
-            ProductAddRequest productAddRequest2 = new ProductAddRequest
-            {
-                ProductName = "Banana",
-                Price = 15.0m,
-                CategoryId = Guid.NewGuid(), // Assuming CategoryId is required
-            };
+            ProductAddRequest productAddRequest1 = _fixture.Build<ProductAddRequest>().With(p => p.ProductName == "Apple").Create();
+            ProductAddRequest productAddRequest2 = _fixture.Build<ProductAddRequest>().With(p => p.ProductName == "Banana").Create();
             await _productService.AddProduct(productAddRequest1);
             await _productService.AddProduct(productAddRequest2);
 

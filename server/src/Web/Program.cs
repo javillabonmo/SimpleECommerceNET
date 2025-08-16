@@ -9,7 +9,9 @@ using System.Runtime.InteropServices;
 using Application.Services;
 using Application.Services.Interfaces;
 
+using Infraestructure.Interfaces;
 using Infraestructure.Persistence;
+using Infraestructure.Repositories;
 
 using Microsoft.EntityFrameworkCore;
 
@@ -22,6 +24,9 @@ CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+builder.Services.AddScoped<IProductRepository, ProductRepository>();
+
 
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
