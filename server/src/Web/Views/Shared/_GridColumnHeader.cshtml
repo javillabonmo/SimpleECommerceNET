@@ -1,13 +1,22 @@
 ﻿@using Application.DTOs.Enums
-@if (ViewBag.CurrentSortBy == ViewBag.ColumnName && ViewBag.CurrentSortOrder == SortOrderEnum.Ascending.ToString())
-{
-	<a href="/products?searchBy=@ViewBag.CurrentSearchBy&searchString=@ViewBag.CurrentSearchString&sortBy=@(ViewBag.ColumnName)&sortOrder=@(nameof(SortOrderEnum.Descending))">@ViewBag.ColumnDisplayName</a>
+
+@{
+    var sortOrder = SortOrderEnum.Ascending.ToString();
+    if (ViewBag.CurrentSortBy == ViewBag.ColumnName && ViewBag.CurrentSortOrder == SortOrderEnum.Ascending.ToString())
+    {
+        sortOrder = SortOrderEnum.Descending.ToString();
+    }
+    else if (ViewBag.CurrentSortBy == ViewBag.ColumnName && ViewBag.CurrentSortOrder == SortOrderEnum.Descending.ToString())
+    {
+        sortOrder = SortOrderEnum.Ascending.ToString();
+    }
 }
-else if (ViewBag.CurrentSortBy == ViewBag.ColumnName && ViewBag.CurrentSortOrder == SortOrderEnum.Descending.ToString())
-{
-	<a href="/products?searchBy=@ViewBag.CurrentSearchBy&searchString=@ViewBag.CurrentSearchString&sortBy=@(ViewBag.ColumnName)&sortOrder=@(nameof(SortOrderEnum.Ascending))">@ViewBag.ColumnDisplayName</a>
-}
-else
-{
-	<a href="/products?searchBy=@ViewBag.CurrentSearchBy&searchString=@ViewBag.CurrentSearchString&sortBy=@(ViewBag.ColumnName)&sortOrder=@(nameof(SortOrderEnum.Ascending))">@ViewBag.ColumnDisplayName</a>
-}
+
+<a asp-controller="Product"
+   asp-action="Index"
+   asp-route-searchBy="@ViewBag.CurrentSearchBy"
+   asp-route-searchString="@ViewBag.CurrentSearchString"
+   asp-route-sortBy="@ViewBag.ColumnName"
+   asp-route-sortOrder="@sortOrder">
+    @ViewBag.ColumnDisplayName
+</a>

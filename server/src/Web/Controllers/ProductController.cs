@@ -9,6 +9,7 @@ namespace Web.Controllers
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.Rendering;
 
+    using Web.Controllers.FIlters.ActionFilters;
 
     [Route("[controller]")]
     public class ProductController : Controller
@@ -60,7 +61,8 @@ namespace Web.Controllers
         }
         [Route("[action]")]
         [HttpPost]
-        public async Task<IActionResult> Create(ProductAddRequest productAddRequest)
+
+        public async Task<IActionResult> Create(ProductAddRequest productRequest)
         {
             if (!ModelState.IsValid)
             {
@@ -69,7 +71,7 @@ namespace Web.Controllers
                 ViewBag.Errors = ModelState.Values.SelectMany(value => value.Errors).Select(e => e.ErrorMessage).ToList();
                 return View();
             }
-            await _productService.AddProduct(productAddRequest);
+            await _productService.AddProduct(productRequest);
             return RedirectToAction("Index", "Product");
         }
         [Route("[action]/{id}")]
@@ -90,27 +92,19 @@ namespace Web.Controllers
 
         [Route("[action]/{id}")]
         [HttpPost]
-        public async Task<IActionResult> Update(ProductUpdateRequest productUpdateRequest)
+        [TypeFilter(typeof(InvalidModelStateValidation))]
+        public async Task<IActionResult> Update(ProductUpdateRequest productRequest)
         {
-            ProductResponse? productResponse = await _productService.GetProductById(productUpdateRequest.ProductId);
+            ProductResponse? productResponse = await _productService.GetProductById(productRequest.ProductId);
             if (productResponse == null)
             {
                 //NotFound();
                 return RedirectToAction("Index", "Product");
             }
-            if (ModelState.IsValid)
-            {
-                await _productService.UpdateProduct(productUpdateRequest);
-                return RedirectToAction("Index", "Product");
-            }
-            else
-            {
-                ProductUpdateRequest product = productResponse.ToProductUpdateRequest();
-                IEnumerable<CategoryResponse> categories = await _categoryService.GetCategories();
-                ViewBag.Categories = categories.Select(category => new SelectListItem { Text = category.CategoryName, Value = category.CategoryId.ToString() });
-                ViewBag.Errors = ModelState.Values.SelectMany(value => value.Errors).Select(e => e.ErrorMessage).ToList();
-                return View(productResponse.ToProductUpdateRequest());
-            }
+
+            await _productService.UpdateProduct(productRequest);
+            return RedirectToAction("Index", "Product");
+
 
         }
 
