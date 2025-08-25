@@ -3,13 +3,13 @@
 // </copyright>
 // <author> javillabonmo </author>
 
-namespace Infraestructure.Persistence
+namespace SimpleECommerce.Infraestructure.Persistence
 {
-    using Domain.Entities.AuthDB;
-    using Domain.Entities.Inventory;
-    using Domain.Entities.Sales;
-
     using Microsoft.EntityFrameworkCore;
+
+    using SimpleEcommerce.Core.Domain.Entities.AuthDB;
+    using SimpleEcommerce.Core.Domain.Entities.Inventory;
+    using SimpleEcommerce.Core.Domain.Entities.Sales;
 
     /// <summary>
     /// Defines the <see cref="ApplicationDbContext" />
@@ -33,6 +33,7 @@ namespace Infraestructure.Persistence
         public DbSet<Category> Categories { get; set; }
 
         public DbSet<Product> Products { get; set; }
+        public DbSet<Order> Orders { get; set; }
 
         /// <summary>
         /// The OnModelCreating
@@ -54,6 +55,8 @@ namespace Infraestructure.Persistence
             modelBuilder.Entity<Product>()
                 .ToTable("Productos", p => p.HasCheckConstraint("CK_PrecioStock_Positivos", "[Precio] > 0 AND [Stock] > 0"));
 
+            modelBuilder.Entity<Order>().Property(p => p.InternalId).ValueGeneratedOnAdd();
+            modelBuilder.Entity<Order>().ToTable("Orden");
             // seeds
             var adminRoleId = Guid.Parse("adc7f81e-d8ef-4cab-bbb6-32868d5681f4");
             var productRoleId = Guid.Parse("be04f811-123b-420b-938b-04ba64248f0a");

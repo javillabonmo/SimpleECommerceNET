@@ -2,14 +2,20 @@
 
 namespace Web.Controllers
 {
-    using Application.DTOs;
-    using Application.DTOs.Enums;
-    using Application.Services.Interfaces;
+
 
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.Rendering;
 
+    using SimpleEcommerce.Core.DTOs;
+
+    using SimpleECommerce.Core.DTOs;
+    using SimpleECommerce.Core.Enums;
+    using SimpleECommerce.Core.ServicesContrats;
+
     using Web.Controllers.FIlters.ActionFilters;
+    using Web.Controllers.FIlters.AuthorizationFilters;
+    using Web.Controllers.FIlters.ResultFilters;
 
     [Route("[controller]")]
     public class ProductController : Controller
@@ -62,7 +68,7 @@ namespace Web.Controllers
         [Route("[action]")]
         [HttpPost]
 
-        public async Task<IActionResult> Create(ProductAddRequest productRequest)
+        public async Task<IActionResult> Create(ProductRequest productRequest)
         {
             if (!ModelState.IsValid)
             {
@@ -76,6 +82,7 @@ namespace Web.Controllers
         }
         [Route("[action]/{id}")]
         [HttpGet]
+        [TypeFilter(typeof(TokenResultFilter))]
         public async Task<IActionResult> Update(Guid id)
         {
             ProductResponse? productResponse = await _productService.GetProductById(id);
@@ -93,6 +100,7 @@ namespace Web.Controllers
         [Route("[action]/{id}")]
         [HttpPost]
         [TypeFilter(typeof(InvalidModelStateValidation))]
+        [TypeFilter(typeof(TokenAuthorizationFIlter))]
         public async Task<IActionResult> Update(ProductUpdateRequest productRequest)
         {
             ProductResponse? productResponse = await _productService.GetProductById(productRequest.ProductId);

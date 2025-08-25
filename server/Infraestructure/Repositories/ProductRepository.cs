@@ -1,13 +1,14 @@
-﻿namespace Infraestructure.Repositories
+﻿namespace SimepleECommerce.Infraestructure.Repositories
 {
     using System.Linq.Expressions;
 
-    using Domain.Entities.Inventory;
 
-    using Infraestructure.Interfaces;
-    using Infraestructure.Persistence;
+    using SimpleECommerce.Infraestructure.Persistence;
 
     using Microsoft.EntityFrameworkCore;
+
+    using SimpleEcommerce.Core.Domain.Entities.Inventory;
+    using SimpleEcommerce.Core.Domain.RespositoryContracts;
 
     public class ProductRepository : IProductRepository
     {

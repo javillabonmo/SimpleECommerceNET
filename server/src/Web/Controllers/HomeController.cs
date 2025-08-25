@@ -1,4 +1,6 @@
 using System.Diagnostics;
+
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 
 using Web.ViewModels;
@@ -24,11 +26,17 @@ public class HomeController : Controller
     {
         return View();
     }
-    /*
+
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public IActionResult Error()
     {
-        return View(new ErrorViewModel { RequestId = Activity.Current?.ProductId ?? HttpContext.TraceIdentifier });
+
+        IExceptionHandlerPathFeature exceptionHandlerPathFeature = HttpContext.Features.Get<IExceptionHandlerPathFeature>()!;
+
+        _logger.LogError(exceptionHandlerPathFeature.Error, "Unhandled exception occurred on path: {Path}", exceptionHandlerPathFeature.Path);
+        ViewBag.ErrorMessage = exceptionHandlerPathFeature.Error.Message;
+
+        return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
     }
-    */
+
 }

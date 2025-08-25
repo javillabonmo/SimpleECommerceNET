@@ -4,9 +4,11 @@ namespace Web.Controllers.FIlters.ActionFilters
 {
     using System.Threading.Tasks;
 
-    using Application.DTOs;
+
 
     using Microsoft.AspNetCore.Mvc.Filters;
+
+    using SimpleECommerce.Core.DTOs;
 
     public class ProductActionFilter : IAsyncActionFilter
     {
