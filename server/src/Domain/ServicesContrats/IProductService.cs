@@ -1,0 +1,44 @@
+﻿
+
+
+namespace SimpleECommerce.Core.ServicesContrats
+{
+    using SimpleECommerce.Core.DTOs;
+    using SimpleECommerce.Core.Enums;
+
+    /*
+*
+* 1. validaciones de negocio y seguridad
+* 2. logica de validacion independiente del objeto
+* el Category debe existir
+* el producto no puede estar duplicado
+* validar que exista el producto antes de actualizar o eliminar
+*
+*/
+    public interface IProductService
+    {
+        Task<ProductResponse> AddProduct(ProductRequest? productAddRequest);
+
+        // en lugar de usar null o false manejar excepciones para los casos de error
+
+
+        Task<ProductResponse?> GetProductById(int id);
+
+        Task<ProductResponse?> GetProductById(Guid id);
+
+        Task<IEnumerable<ProductResponse>> GetProducts();
+
+        Task<ProductResponse?> UpdateProduct(ProductUpdateRequest? productUpdateRequest); // return ProductDto con el objeto actualizado o null si no existe
+
+        Task<bool> DeleteProduct(Guid id); // return true si se elimino, false si no existe
+
+        // bool DeleteProduct(int id,Guid userId);//informacion del usuario que elimina el producto, puede ser un token de autenticacion 
+        Task<IEnumerable<ProductResponse>> GetFilteredProducts(string searchBy, string? searchString);
+
+        // IEnumerable<ProductResponse> GetFilteredProducts(string? searchBy, string? searchString, int pageNumber, int pageSize);
+
+        // IEnumerable<ProductResponse> DeleteMultipleProductsById(IEnumerable<int> selectedIds);
+        IEnumerable<ProductResponse> GetSortedProducts(IEnumerable<ProductResponse> products, string sortBy, SortOrderEnum sortOrder);
+    }
+}
+
